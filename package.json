@@ -2,16 +2,10 @@
   "name": "Astral",
   "version": "1.0.0",
   "description": "Epic proxy",
-  "main": "index.js",
-  "directories": {
-    "lib": "lib"
-  },
-  "scripts": {
-    "start": "node index.js"
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
-    "url": "git://github.com/Reider71164/Astral-Games.git"
+    "url": "https://github.com/Reider71164/Astral-Games.git"
   },
   "keywords": [],
   "author": "",
