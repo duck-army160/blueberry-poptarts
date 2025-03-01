@@ -184,6 +184,12 @@
             { name: "Five Nights at Freddys 3", img: "storage/images/FNaF3_Steam_Greenlight_Icon.webp", link: "storage/gxmes/fnaf/fnaf3/index.html" },
             { name: "AdVenture Capitalist", img: "storage/images/channels4_profile.jpg", link: "storage/gxmes/adcap/index.html" },
             { name: "Break Lock", img: "storage/gxmes/breaklock/assets/icons/ios-180x180.png", link: "storage/gxmes/breaklock/index.html" },
+            { name: "Friday Night Funkin", img: "storage/gxmes/fridaynightfunkin/fnf-icon.jpg", link: "storage/gxmes/fridaynightfunkin/index.html" },
+            { name: "Chill Radio", img: "storage/gxmes/chill-radio/img/icon.png", link: "storage/gxmes/chill-radio/index.html" },
+            { name: "My Rusty Submarine", img: "storage/gxmes/my-rusty-submarine/splash.png", link: "storage/gxmes/my-rusty-submarine/index.html" },
+            { name: "Mini Putt", img: "storage/gxmes/miniputt/miniputt.png", link: "storage/gxmes/miniputt/index.html" },
+            { name: "Slime Rush TD", img: "storage/gxmes/slime-rush-td/splash.png", link: "storage/gxmes/slime-rush-td/index.html" },
+            { name: "Sky Car Stunt 3D", img: "storage/gxmes/sky-car-stunt/512x512.png", link: "storage/gxmes/sky-car-stunt/index.html" },
             // { name: "", img: "storage/images/", link: "storage/gxmes/" },
         ];
         games.sort((a, b) => a.name.localeCompare(b.name));
@@ -193,7 +199,6 @@
         const totalGames = document.getElementById('total-games');
         const searchInput = document.getElementById('searchInput');
 
-        // Function to display games
         function displayGames(gameList) {
             gameGrid.innerHTML = '';
             gameList.forEach((game, index) => {
@@ -217,10 +222,8 @@
             searchInput.placeholder = `Search ${gameList.length} Gxmes...`;
         }
 
-        // Initial display
         displayGames(games);
 
-        // Search functionality
         searchInput.addEventListener('input', () => {
             const searchTerm = searchInput.value.trim().toLowerCase();
             const filteredGames = games.filter(game =>
