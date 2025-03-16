@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3044824252307692"
+            crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astral Gxmes | Gxmes</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        #searchInput {
+            width: 300px;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 90px;
+            background-color: black;
+            color: white;
+            font-weight: bold;
+            outline: none;
+        }
+
+        ::placeholder {
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul class="nav-list">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="gxmes.html">Gxmes</a></li>
+                <li><a href="emulator.html">Emulator</a></li>
+                <li><a href="search.html">Search</a></li>
+                <li><a href="other.html">Other</a></li>
+                <li><a href="policy-password-tool.html">Wifi Password Puller</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h1>Gxmes</h1>
+        <input type="text" id="searchInput" placeholder="Search Gxmes...">
+        <div class="game-grid" id="game-grid">
+        </div>
+    </main>
+    <script>
+        const games = [
+            { name: "Windows 11 Clone", img: "storage/images/windows11clone.jpg", link: "storage/other/windows11/index.html" },
+            // { name: "", img: "storage/images/", link: "storage/gxmes/" },
+        ];
+        games.sort((a, b) => a.name.localeCompare(b.name));
+
+        const gameGrid = document.getElementById('game-grid');
+        const gameCount = document.getElementById('game-count');
+        const totalGames = document.getElementById('total-games');
+        const searchInput = document.getElementById('searchInput');
+
+        function displayGames(gameList) {
+            gameGrid.innerHTML = '';
+            gameList.forEach((game, index) => {
+                const gameItem = document.createElement('a');
+                gameItem.className = 'game-item';
+                gameItem.style.animationDelay = `${index * 0.03}s`; 
+                gameItem.href = game.link;
+
+                const gameImage = document.createElement('img');
+                gameImage.src = game.img;
+                gameImage.alt = game.name;
+
+                const gameName = document.createElement('div');
+                gameName.className = 'game-name';
+                gameName.textContent = game.name;
+
+                gameItem.appendChild(gameImage);
+                gameItem.appendChild(gameName);
+                gameGrid.appendChild(gameItem);
+            });
+            searchInput.placeholder = `Search ${gameList.length} Other Random Things...`;
+        }
+
+        displayGames(games);
+
+        searchInput.addEventListener('input', () => {
+            const searchTerm = searchInput.value.trim().toLowerCase();
+            const filteredGames = games.filter(game =>
+                game.name.toLowerCase().includes(searchTerm)
+            );
+            displayGames(filteredGames);
+        });
+    </script>
+</body>
+</html>
