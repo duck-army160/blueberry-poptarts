@@ -1,0 +1,91 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #222;
+      font-family: 'Fredoka One', sans-serif;
+      margin: 0;
+    }
+
+    #game-container {
+      position: relative;
+    }
+
+    #score {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: white;
+      font-size: 1.5em;
+      z-index: 10;
+    }
+
+
+    #game-board {
+      display: grid;
+      grid-template-columns: repeat(17, 30px);
+      grid-template-rows: repeat(17, 30px);
+      gap: 1px;
+      background-color: #000;
+    }
+
+    .game-cell {
+      background-color: #333;
+    }
+
+    .snake-body {
+      background-color: limegreen;
+    }
+
+    .food {
+      background-color: red;
+    }
+
+    #game-over-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      color: white;
+      font-size: 2em;
+    }
+
+    #game-over-screen button {
+      font-size: 1em;
+      padding: 10px 20px;
+      margin: 10px;
+      border: none;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="game-container">
+    <div id="score">Score: 0</div>
+    <div id="game-board"></div>
+  </div>
+  <div id="game-over-screen"><button>Play Again</button></div>
+  <script type="module" src="script.js"></script>
+</body>
+
+</html>
