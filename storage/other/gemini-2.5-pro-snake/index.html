@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"> <!-- Prevent zooming on mobile -->
+    <title>Snake Game - Fullscreen</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas" width="600" height="600"></canvas> <!-- Increased Size -->
+        <div id="start-screen" class="overlay">
+            <h2>SNAKE</h2>
+            <p>Use Arrow Keys to Move</p>
+            <button id="start-button" class="game-button">Start Game</button>
+        </div>
+        <div id="game-over-screen" class="overlay hidden">
+            <h2>Game Over!</h2>
+            <p>Final Score: <span id="final-score">0</span></p>
+            <p>High Score: <span id="final-highscore">0</span></p>
+            <button id="restart-button" class="game-button restart">Play Again</button>
+        </div>
+    </div>
+
+    <!-- Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Game Logic -->
+    <script src="script.js"></script>
+</body>
+</html>
