@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta property="og:title" content="Astral Games" />
+<meta property="og:image" content="https://media1.tenor.com/m/PLED4JVYckoAAAAd/mango-cat-dance.gif" />
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3044824252307692"
+            crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astral Gxmes | Home</title>
+    <link rel="stylesheet" href="ALTERNATIVEstyle.css">
+    <script src="index.js" defer></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul class="nav-list">
+                <li><a href="ALTERNATIVEindex.html">Home</a></li>
+                <li><a href="ALTERNATIVEgxmes.html">Gxmes</a></li>
+                <li><a href="ALTERNATIVEemulator.html">Emulator</a></li>
+                <li><a href="ALTERNATIVEsearch.html">Search</a></li>
+                <li><a href="ALTERNATIVEother.html">Other</a></li>
+                <li><a href="policy-password-tool.html">Wifi Password Puller</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="center-container">
+            <h1>Welcome To <span>Astral Gxmes</span></h1>
+            <p id="splash"></p>
+            <br />
+            <button onclick="window.location.href='https://discord.gg/v54gnj4MGn'" class="button play">
+                Join our Discord
+            </button>
+            <button onclick="launchab()" id="launchab" class="button play">
+                Launch in about:blank
+            </button>
+        </div>
+    </main>
+    <script>
+        fetch('./storage/splash.json')
+            .then((res) => res.json())
+            .then((data) => {
+                document.querySelector('#splash').innerHTML =
+                    data[Math.floor(Math.random() * data.length)]
+            })
+    </script>
+</body>
+</html>
