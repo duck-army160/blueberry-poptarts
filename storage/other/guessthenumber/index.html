@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess the Number</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        #checkGuess, #restartButton {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.3s ease;
+            cursor: pointer; /* Add this line */
+        }
+        #checkGuess:hover, #restartButton:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        #checkGuess:active, #restartButton:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        #resultContainer {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        #guessInput {
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        #guessInput:focus {
+            border-color: #6366f1; /* Indigo color from Tailwind */
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); /* Indigo with opacity */
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-r from-purple-400 to-blue-500 h-screen flex justify-center items-center">
+    <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full relative">
+        <h1 class="text-3xl font-semibold text-gray-800 mb-4">Guess the Number!</h1>
+        <p class="text-lg text-gray-700 mb-4">I'm thinking of a number between 1 and 100.</p>
+
+        <div id="resultContainer" class="hidden mb-4">
+            <div id="alert" class="rounded-md p-4">
+                <div id="result"></div>
+            </div>
+        </div>
+
+        <div class="relative mb-4">
+            <input type="number" id="guessInput" placeholder="Guess the number" class="w-full px-4 py-2 rounded-md border border-gray-300 focus:ring focus:ring-blue-200 focus:outline-none">
+            <label for="guessInput" class="absolute left-2 -top-3 text-gray-600 text-sm bg-white px-1 transition-all peer-placeholder-shown:top-2 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-3 peer-focus:text-gray-600 peer-focus:text-sm">Guess the number</label>
+        </div>
+
+        <p id="guessesLeft" class="text-gray-600 mb-4"></p>
+
+        <div class="flex justify-center space-x-4 mt-4">
+            <button onclick="checkGuess()" id="checkGuess" class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 transition-colors duration-300">Check Guess</button>
+            <button onclick="restartGame()" id="restartButton" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 transition-colors duration-300">Restart Game</button>
+        </div>
+    </div>
+
+    <script>
+        let randomNumber = Math.floor(Math.random() * 100) + 1;
+        let guessesLeft = 10;
+
+        const guessInput = document.getElementById("guessInput");
+        const checkGuessButton = document.getElementById("checkGuess");
+        const restartButton = document.getElementById("restartButton");
+        const guessesLeftDisplay = document.getElementById("guessesLeft");
+        const result = document.getElementById("result");
+        const resultContainer = document.getElementById("resultContainer");
+        const alertContainer = document.getElementById("alert");
+
+        guessesLeftDisplay.textContent = `Guesses left: ${guessesLeft}`;
+
+
+        function checkGuess() {
+            const guess = Number(guessInput.value);
+
+            if (guess < 1 || guess > 100 || isNaN(guess)) {
+                resultContainer.classList.remove("hidden");
+                alertContainer.classList.remove("bg-blue-100", "border-blue-400", "text-blue-700");
+                alertContainer.classList.add("bg-red-100", "border-red-400", "text-red-700");
+                result.innerHTML = "Please enter a valid number between 1 and 100.";
+                guessInput.value = "";
+                return;
+            }
+
+            guessesLeft--;
+            guessesLeftDisplay.textContent = `Guesses left: ${guessesLeft}`;
+
+            if (guess === randomNumber) {
+                resultContainer.classList.remove("hidden");
+                alertContainer.classList.remove("bg-blue-100", "border-blue-400", "text-blue-700", "bg-red-100", "border-red-400", "text-red-700");
+                alertContainer.classList.add("bg-green-100", "border-green-400", "text-green-700");
+                result.innerHTML = `
+                    <h2 class="font-semibold text-2xl">Congratulations!</h2>
+                    <p>You guessed it!</p>`;
+                disableGame();
+            } else if (guessesLeft === 0) {
+                resultContainer.classList.remove("hidden");
+                alertContainer.classList.remove("bg-blue-100", "border-blue-400", "text-blue-700", "bg-green-100", "border-green-400", "text-green-700");
+                alertContainer.classList.add("bg-red-100", "border-red-400", "text-red-700");
+                result.innerHTML = `
+                    <h2 class="font-semibold text-2xl">Game Over!</h2>
+                    <p>The number was ${randomNumber}.</p>`;
+                disableGame();
+            } else {
+                resultContainer.classList.remove("hidden");
+                alertContainer.classList.add("bg-blue-100", "border-blue-400", "text-blue-700");
+                alertContainer.classList.remove("bg-green-100", "border-green-400", "text-green-700", "bg-red-100", "border-red-400", "text-red-700");
+                result.textContent = guess > randomNumber ? "Too high!" : "Too low!";
+                guessInput.value = "";
+                guessInput.focus();
+            }
+        }
+
+        function disableGame() {
+            guessInput.disabled = true;
+            checkGuessButton.disabled = true;
+        }
+
+        function restartGame() {
+            randomNumber = Math.floor(Math.random() * 100) + 1;
+            guessesLeft = 10;
+
+            guessInput.disabled = false;
+            checkGuessButton.disabled = false;
+            guessInput.value = "";
+            guessesLeftDisplay.textContent = `Guesses left: ${guessesLeft}`;
+            resultContainer.classList.add("hidden");
+            alertContainer.classList.remove("bg-green-100", "border-green-400", "text-green-700", "bg-red-100", "border-red-400", "text-red-700", "bg-blue-100", "border-blue-400", "text-blue-700");
+            result.innerHTML = "";
+            guessInput.focus();
+
+        }
+    </script>
+</body>
+</html>

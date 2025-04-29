@@ -2,131 +2,206 @@
 <html lang="en-us">
 
   <head>
+    <!-- Google Analytics (Original) -->
     <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-7FN7LEVWXD"></script>
     <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-7FN7LEVWXD');
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-7FN7LEVWXD');
     </script>
+    <!-- End Google Analytics -->
 
-    <title>Burrito Bison | Seraph</title>
-    <link rel="shortcut icon" href="../../images/ico.ico" type="image/x-icon">
-    <script src="../../storage/js/cloak.js"></script>
+    <title>Burrito Bison | Seraph</title> <!-- Original Title -->
+    <link rel="shortcut icon" href="../../images/ico.ico" type="image/x-icon"> <!-- Original Favicon -->
+    <script src="../../storage/js/cloak.js"></script> <!-- Original Cloak Script -->
 
     <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> <!-- Added for good measure -->
+
+    <!-- Original Styles -->
     <style>
-      html {
-        box-sizing: border-box;
-      }
-      *, *:before, *:after {
-        box-sizing: inherit;
-      }
-      body {
-        margin: 0;
-        background: #000000;
-      }
-      #gameContainer {
-        width: 100vw;
-        height: 100vh;
-      }
-      canvas {
-        width: 100%;
-        height: 100%;
-        display: block;
-      }
+      html { box-sizing: border-box; }
+      *, *:before, *:after { box-sizing: inherit; }
+      body { margin: 0; background: #000000; }
+      #gameContainer { width: 100vw; height: 100vh; }
+      canvas { width: 100%; height: 100%; display: block; }
+      #loader { position: absolute; left: 0; top: 0; width: 100vw; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+      .logo { display: block; width: 100vw; height: 70vh; }
+      .progress { margin: 1.5em; border: 1px solid white; width: 50vw; display: none; }
+      .progress .full { margin: 2px; background: white; height: 1em; transform-origin: top left; }
+      .spinner, .spinner:after { border-radius: 50%; width: 5em; height: 5em; }
+      .spinner { margin: 10px; font-size: 10px; position: relative; text-indent: -9999em; border-top: 1.1em solid rgba(255, 255, 255, 0.2); border-right: 1.1em solid rgba(255, 255, 255, 0.2); border-bottom: 1.1em solid rgba(255, 255, 255, 0.2); border-left: 1.1em solid #ffffff; transform: translateZ(0); animation: spinner-spin 1.1s infinite linear; }
+      @keyframes spinner-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-      .logo {
-          display: block;
-          width: 100vw;
-          height: 70vh;
-      }
-
-      .progress {
-          margin: 1.5em;
-          border: 1px solid white;
-          width: 50vw;
-          display: none;
-      }
-      .progress .full {
-          margin: 2px;
-          background: white;
-          height: 1em;
-          transform-origin: top left;
-      }
-
-      #loader {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100vw;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .spinner,
-      .spinner:after {
-        border-radius: 50%;
-        width: 5em;
-        height: 5em;
-      }
-      .spinner {
-        margin: 10px;
-        font-size: 10px;
-        position: relative;
-        text-indent: -9999em;
-        border-top: 1.1em solid rgba(255, 255, 255, 0.2);
-        border-right: 1.1em solid rgba(255, 255, 255, 0.2);
-        border-bottom: 1.1em solid rgba(255, 255, 255, 0.2);
-        border-left: 1.1em solid #ffffff;
-        transform: translateZ(0);
-        animation: spinner-spin 1.1s infinite linear;
-      }
-      @keyframes spinner-spin {
-        0% {
-          transform: rotate(0deg);
+      /* MODDED CODE: Button Style */
+       #speedBoostButton {
+            position: absolute; /* Position relative to the page */
+            top: 20px;          /* Distance from the top */
+            left: 20px;         /* Distance from the left */
+            z-index: 1000;      /* Ensure it's on top of the game canvas */
+            padding: 12px 20px;
+            font-size: 18px;
+            font-family: sans-serif; /* Basic readable font */
+            cursor: pointer;
+            background-color: #FF4500; /* Orange-Red */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+            opacity: 0.8; /* Slightly transparent */
         }
-        100% {
-          transform: rotate(360deg);
+        #speedBoostButton:hover {
+            background-color: #FF6347; /* Lighter Orange-Red */
+            opacity: 1.0;
         }
-      }
-
+        #speedBoostButton:active {
+            background-color: #CD5C5C; /* Indian Red */
+            box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+            transform: translateY(1px);
+        }
+         #speedBoostButton:disabled {
+            background-color: #A9A9A9; /* Dark Gray */
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+      /* END MODDED CODE: Button Style */
     </style>
   </head>
 
   <body>
+    <!-- Original Unity Container -->
     <div id="gameContainer"></div>
+
+    <!-- Original Loader -->
     <div id="loader">
       <img class="logo" src="Build/logo.png">
       <div class="spinner"></div>
       <div class="progress"><div class="full"></div></div>
     </div>
+
+    <!-- START MODDED CODE: Speed Boost Button HTML -->
+    <button id="speedBoostButton">FASTER!</button>
+    <!-- END MODDED CODE: Speed Boost Button HTML -->
+
   </body>
 
+  <!-- Original Game Scripts (Keep these!) -->
   <script src="js/unity-mod.js"></script>
   <script src="Build/UnityLoader.js"></script>
   <script src='Build/kongregate_api.js'></script>
+
+  <!-- Original Game Instantiation Script -->
   <script>
-  var gameInstance = UnityLoader.instantiate("gameContainer", "Build/Web.json", {onProgress: UnityProgress});
-  function UnityProgress(gameInstance, progress) {
-    if (!gameInstance.Module) {
-      return;
+    var gameInstance = UnityLoader.instantiate("gameContainer", "Build/Web.json", {onProgress: UnityProgress});
+    function UnityProgress(gameInstance, progress) {
+      if (!gameInstance.Module) {
+        return;
+      }
+      const loader = document.querySelector("#loader");
+      if (!gameInstance.progress) {
+        const progress = document.querySelector("#loader .progress");
+        progress.style.display = "block";
+        gameInstance.progress = progress.querySelector(".full");
+        loader.querySelector(".spinner").style.display = "none";
+      }
+      gameInstance.progress.style.transform = `scaleX(${progress})`;
+      if (progress === 1 && !gameInstance.removeTimeout) {
+       loader.style.display = "none";
+      }
     }
-    const loader = document.querySelector("#loader");
-    if (!gameInstance.progress) {
-      const progress = document.querySelector("#loader .progress");
-      progress.style.display = "block";
-      gameInstance.progress = progress.querySelector(".full");
-      loader.querySelector(".spinner").style.display = "none";
-    }
-    gameInstance.progress.style.transform = `scaleX(${progress})`;
-    if (progress === 1 && !gameInstance.removeTimeout) {
-     loader.style.display = "none";
-    }
-  }
   </script>
+
+  <!-- START MODDED CODE: Button Functionality Script -->
+  <script>
+    // WARNING: This script attempts to interact with the Unity game engine.
+    // The placeholders below MUST be replaced with the correct names found
+    // by inspecting the game's JavaScript files (likely Build/UnityLoader.js
+    // or Build/xxxx.framework.js). This is difficult and likely requires guessing.
+    // This code will probably NOT WORK without modification.
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+      const boostButton = document.getElementById('speedBoostButton');
+      let boostActive = false;
+      const originalSpeed = 1.0; // Assuming normal speed multiplier is 1.0
+      const boostMultiplier = 2.5; // How much faster to make the player
+      const boostDuration = 1500;  // Duration of the boost in milliseconds
+
+      // We know from the HTML that the instance variable is named 'gameInstance'
+      // However, we still need to wait for UnityLoader to actually create it.
+      let checkInstanceInterval = setInterval(() => {
+        if (typeof gameInstance !== 'undefined' && gameInstance !== null && gameInstance.SendMessage) {
+          clearInterval(checkInstanceInterval); // Stop checking
+          console.log("[Mod Script] Unity instance 'gameInstance' found.");
+          initializeButtonListener();
+        } else {
+          // Optional: console.log("[Mod Script] Waiting for gameInstance...");
+        }
+      }, 200); // Check every 200ms
+
+      function initializeButtonListener() {
+        if (boostButton) {
+            boostButton.addEventListener('click', () => {
+                if (boostActive) {
+                     console.log("[Mod Script] Boost already active.");
+                     return;
+                }
+
+                console.log("[Mod Script] Speed Boost button clicked!");
+                boostActive = true;
+                boostButton.disabled = true;
+
+                try {
+                    // --- !!! CRITICAL PART: REPLACE THESE PLACEHOLDERS !!! ---
+                    // You MUST replace these with the actual names used inside the Unity game.
+                    // Search the game's JS files (Build/UnityLoader.js, Build/Web.framework.js, etc.)
+                    // Look for 'SendMessage' or keywords like 'speed', 'velocity', 'boost', 'player', 'bison'.
+                    const unityGameObjectName = "Player";        // !!! REPLACE THIS !!! (Guess)
+                    const unityFunctionName = "ApplySpeedBoost"; // !!! REPLACE THIS !!! (Guess)
+                    // Alternative function name guesses: "SetSpeedMultiplier", "SetVelocityFactor", "ModifySpeed"
+                    // The function might expect a number (multiplier like 2.5) or maybe just 'true'. Adjust boostValueToSend if needed.
+                    const boostValueToSend = boostMultiplier; // Or maybe 'true' if it's an on/off function
+
+                    console.log(`[Mod Script] Attempting SendMessage: GameObject='${unityGameObjectName}', Function='${unityFunctionName}', Value='${boostValueToSend}'`);
+                    gameInstance.SendMessage(unityGameObjectName, unityFunctionName, boostValueToSend);
+
+                    // Reset speed after duration
+                    setTimeout(() => {
+                        try {
+                            // Assume the *same function* can be used to reset, or find a separate reset function name
+                            const resetButtonValue = originalSpeed; // Or maybe 'false'
+                            console.log(`[Mod Script] Attempting SendMessage to reset speed: GameObject='${unityGameObjectName}', Function='${unityFunctionName}', Value='${resetButtonValue}'`);
+                            gameInstance.SendMessage(unityGameObjectName, unityFunctionName, resetButtonValue);
+                        } catch (e) {
+                            console.error("[Mod Script] Error trying to reset speed via SendMessage:", e);
+                        } finally {
+                            boostActive = false;
+                            boostButton.disabled = false;
+                            console.log("[Mod Script] Boost ended.");
+                        }
+                    }, boostDuration);
+
+                } catch (e) {
+                    console.error("[Mod Script] Error calling SendMessage:", e);
+                    alert("Button Error: Failed to send command to Unity. Check console (F12) for details. The GameObject/Function name might be wrong, or the function might not be exposed.");
+                    boostActive = false;
+                    boostButton.disabled = false;
+                }
+            });
+        } else {
+            console.error("[Mod Script] Speed boost button element (#speedBoostButton) not found!");
+        }
+      } // end initializeButtonListener
+
+      // Initial check in case it's already ready
+      if (typeof gameInstance !== 'undefined' && gameInstance !== null && gameInstance.SendMessage) {
+          clearInterval(checkInstanceInterval);
+          console.log("[Mod Script] Unity instance 'gameInstance' found immediately.");
+          initializeButtonListener();
+      }
+
+    }); // end DOMContentLoaded
+  </script>
+  <!-- END MODDED CODE: Button Functionality Script -->
+
 </html>

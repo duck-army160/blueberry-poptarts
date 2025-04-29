@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galton Board Simulation (Staggered Drop)</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+            overflow: hidden;
+            padding-top: 20px;
+        }
+        #simulationContainer {
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+        }
+        #controls {
+            position: relative;
+            width: 180px;
+            padding: 15px;
+            background-color: rgba(230, 230, 230, 0.9);
+            border-radius: 8px;
+            margin-right: 20px;
+            font-family: sans-serif;
+            font-size: 14px;
+            color: #333;
+            border: 1px solid #ccc;
+        }
+        #controls label {
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 3px;
+            font-weight: bold;
+        }
+        #controls input[type="range"] {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        #controls span {
+            font-weight: normal;
+            margin-left: 5px;
+            min-width: 30px;
+            display: inline-block;
+        }
+        canvas {
+            display: block;
+            border: 1px solid #555;
+        }
+    </style>
+    <!-- Include Matter.js via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+</head>
+<body>
+    <div id="simulationContainer">
+        <div id="controls">
+            <h3>Controls</h3>
+
+            <label for="ballsPerDropSlider">Balls per Drop: <span id="ballsPerDropValue">1</span></label>
+            <input type="range" id="ballsPerDropSlider" min="1" max="10" value="1" step="1">
+
+            <label for="dropIntervalSlider">Drop Cycle Interval (ms): <span id="dropIntervalValue">300</span></label>
+            <input type="range" id="dropIntervalSlider" min="50" max="1000" value="300" step="10">
+
+        </div>
+
+        <canvas id="simulationCanvas"></canvas>
+    </div>
+
+    <script>
+        // --- Matter.js Module Aliases ---
+        const Engine = Matter.Engine;
+        const Render = Matter.Render;
+        const Runner = Matter.Runner;
+        const Bodies = Matter.Bodies;
+        const Composite = Matter.Composite;
+        const Events = Matter.Events;
+
+        // --- Simulation Parameters ---
+        const canvasWidth = 500;
+        const canvasHeight = 700;
+        const wallThickness = 20;
+        const groundHeight = 20;
+        const dividerThickness = 6;
+        const binHeight = 120;
+        const numBins = 13;
+
+        const pegRadius = 4;
+        const pegColor = '#dc3545'; // Red
+        const numPegRows = 15;
+        const pegRowStartY = 90;
+        const pegSpacingX = 28;
+        const pegSpacingY = 28;
+
+        const ballRadius = 5;
+        const ballColor = '#212529';
+        const ballRestitution = 0.3;
+        const ballFriction = 0.05;
+        const ballDensity = 0.01;
+
+        const structureColor = '#ffc107'; // Yellow
+
+        const gravityValue = 0.7;
+        let dropInterval = 300; // Interval between START of drop cycles
+        let ballsPerDrop = 1;
+        const staggerDelay = 35; // Milliseconds delay BETWEEN each ball within a single drop cycle
+
+        const dropY = 40;
+        const funnelGap = 60;
+
+        // --- UI Element References ---
+        const ballsPerDropSlider = document.getElementById('ballsPerDropSlider');
+        const ballsPerDropValueSpan = document.getElementById('ballsPerDropValue');
+        const dropIntervalSlider = document.getElementById('dropIntervalSlider');
+        const dropIntervalValueSpan = document.getElementById('dropIntervalValue');
+
+        // --- Setup Matter.js ---
+        const engine = Engine.create();
+        const world = engine.world;
+        engine.gravity.y = gravityValue;
+
+        const render = Render.create({
+            canvas: document.getElementById('simulationCanvas'),
+            engine: engine,
+            options: {
+                width: canvasWidth,
+                height: canvasHeight,
+                wireframes: false,
+                background: '#f8f9fa'
+            }
+        });
+
+        // --- Create Static Elements ---
+        const staticOptions = {
+            isStatic: true, restitution: 0.1, friction: 0.1, render: { fillStyle: structureColor }
+        };
+        const leftWall = Bodies.rectangle(wallThickness / 2, canvasHeight / 2, wallThickness, canvasHeight, staticOptions);
+        const rightWall = Bodies.rectangle(canvasWidth - wallThickness / 2, canvasHeight / 2, wallThickness, canvasHeight, staticOptions);
+        const ground = Bodies.rectangle(canvasWidth / 2, canvasHeight - groundHeight / 2, canvasWidth, groundHeight, staticOptions);
+        const funnelY = 55;
+        const funnelWallWidth = 10;
+        const funnelWallHeight = 50;
+        const funnelWallLeft = Bodies.rectangle(canvasWidth/2 - funnelGap/2 - funnelWallWidth/2, funnelY, funnelWallWidth, funnelWallHeight, staticOptions);
+        const funnelWallRight = Bodies.rectangle(canvasWidth/2 + funnelGap/2 + funnelWallWidth/2, funnelY, funnelWallWidth, funnelWallHeight, staticOptions);
+        const pegs = [];
+        const boardCenterX = canvasWidth / 2;
+        for (let row = 0; row < numPegRows; row++) {
+            const pegsInThisRow = row + 1;
+            const rowY = pegRowStartY + row * pegSpacingY;
+            const totalRowWidth = (pegsInThisRow - 1) * pegSpacingX;
+            const rowStartX = boardCenterX - totalRowWidth / 2;
+            for (let i = 0; i < pegsInThisRow; i++) {
+                const pegX = rowStartX + i * pegSpacingX;
+                if (pegX > wallThickness + pegRadius && pegX < canvasWidth - wallThickness - pegRadius) {
+                    pegs.push(Bodies.circle(pegX, rowY, pegRadius, {
+                        isStatic: true, restitution: 0.4, friction: 0.02, render: { fillStyle: pegColor }
+                    }));
+                }
+            }
+        }
+        const dividers = [];
+        const binContentWidth = canvasWidth - 2 * wallThickness;
+        const binWidth = binContentWidth / numBins;
+        const dividerBottomY = canvasHeight - groundHeight;
+        const dividerTopY = dividerBottomY - binHeight;
+        const dividerY = (dividerTopY + dividerBottomY) / 2;
+        for (let i = 1; i < numBins; i++) {
+            const dividerX = wallThickness + i * binWidth;
+            dividers.push(Bodies.rectangle(dividerX, dividerY, dividerThickness, binHeight, staticOptions));
+        }
+        Composite.add(world, [
+            leftWall, rightWall, ground, funnelWallLeft, funnelWallRight, ...pegs, ...dividers
+        ]);
+
+        // --- Ball Creation Function ---
+        function createAndAddBall(xPos) {
+            const ball = Bodies.circle(xPos, dropY, ballRadius, {
+                restitution: ballRestitution,
+                friction: ballFriction,
+                density: ballDensity,
+                render: { fillStyle: ballColor }
+            });
+            Composite.add(world, ball);
+        }
+
+        // --- Drop Cycle Function (handles multiple balls with stagger) ---
+        function triggerDropCycle() {
+            const effectiveFunnelWidth = funnelGap - ballRadius * 2;
+            const startX = canvasWidth / 2 - effectiveFunnelWidth / 2;
+
+            if (ballsPerDrop <= 0) return;
+
+            if (ballsPerDrop === 1) {
+                // Drop single ball near the center instantly
+                const dropX = canvasWidth / 2 + (Math.random() - 0.5) * 5;
+                 createAndAddBall(dropX);
+            } else {
+                // Calculate spacing for multiple balls
+                const spacing = ballsPerDrop > 1 ? effectiveFunnelWidth / (ballsPerDrop - 1) : 0; // Avoid division by zero if ballsPerDrop somehow becomes 1 here
+
+                // Loop and schedule each ball creation with a delay
+                for (let i = 0; i < ballsPerDrop; i++) {
+                    const dropX = startX + i * spacing;
+                    const jitter = (Math.random() - 0.5) * (spacing * 0.1);
+                    const finalX = dropX + jitter; // Calculate position now
+
+                    // Use setTimeout to delay the creation of each ball
+                    setTimeout(() => {
+                        createAndAddBall(finalX);
+                    }, i * staggerDelay); // Delay increases for each subsequent ball (0ms, 35ms, 70ms, ...)
+                }
+            }
+        }
+
+        // --- Run the Simulation ---
+        const runner = Runner.create();
+        Runner.run(runner, engine);
+        Render.run(render);
+
+        // --- Initialize and Manage Drop Timer ---
+        let dropTimer = setInterval(triggerDropCycle, dropInterval); // Timer triggers the START of a drop cycle
+
+        // --- Event Listeners for Sliders ---
+        ballsPerDropSlider.addEventListener('input', (event) => {
+            ballsPerDrop = parseInt(event.target.value);
+            ballsPerDropValueSpan.textContent = ballsPerDrop;
+        });
+
+        dropIntervalSlider.addEventListener('input', (event) => {
+            dropInterval = parseInt(event.target.value);
+            dropIntervalValueSpan.textContent = dropInterval;
+            clearInterval(dropTimer); // Clear previous timer
+            dropTimer = setInterval(triggerDropCycle, dropInterval); // Start new timer with updated interval
+        });
+
+        // --- Initial UI Update ---
+        ballsPerDropValueSpan.textContent = ballsPerDropSlider.value;
+        dropIntervalValueSpan.textContent = dropIntervalSlider.value;
+
+    </script>
+</body>
+</html>

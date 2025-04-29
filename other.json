@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Alternative Site Design",
+    "img": "storage/images/alternativedesign.png",
+    "link": "ALTERNATIVEindex.html"
+  },
+  {
+    "name": "Windows 11 Clone",
+    "img": "storage/images/windows11clone.jpg",
+    "link": "storage/other/windows11/index.html"
+  },
+  {
+    "name": "Good AI Coded Snake",
+    "img": "storage/images/geminisnakething.jpg",
+    "link": "storage/other/gemini-2.5-pro-snake/index.html"
+  },
+  {
+    "name": "Guess The Number",
+    "img": "storage/images/guessthenumberr.png",
+    "link": "storage/other/guessthenumber/index.html"
+  },
+  {
+    "name": "Galton Board",
+    "img": "storage/images/Screenshot 2025-04-28 222100.png",
+    "link": "storage/other/galtonboard/index.html"
+  },
+  {
+    "name": "Bad AI Coded Snake",
+    "img": "storage/images/ai-snake.jpg",
+    "link": "storage/other/ai-coded-snake🐍🐍🐍🐍🔥🔥🔥🔥🔥🔥💰💰💰💵💵/index.html"
+  }
+]
