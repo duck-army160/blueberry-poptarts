@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect Four</title>
+    <style>
+        /* Basic Styling & Background */
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column; /* Align items vertically */
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(to bottom right, #3498db, #2980b9); /* Blue gradient background */
+            margin: 0;
+            padding: 20px; /* Add padding for smaller screens */
+            box-sizing: border-box;
+        }
+
+        /* Score Board Styling */
+        #score-board {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #ffffff;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            font-size: 0.9em;
+            color: #555;
+            border: 1px solid #eee;
+        }
+
+        #score-board h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.1em;
+            color: #333;
+            font-weight: bold;
+        }
+
+        #score-values {
+            display: flex;
+            justify-content: center;
+            gap: 15px; /* Space between scores */
+        }
+
+         #score-values span {
+            white-space: nowrap; /* Prevent scores wrapping */
+         }
+
+        /* Main Game Card */
+        #game-wrapper {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 90%; /* Ensure it doesn't stretch too wide */
+            width: fit-content; /* Adjust width based on content */
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 25px;
+            color: #333;
+            font-weight: bold;
+            font-size: 2.2em;
+        }
+
+        #status {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            height: 1.5em; /* Prevent layout shift */
+            font-weight: 600;
+            color: #555;
+        }
+
+        /* Board Styling */
+        #board {
+            background-color: #3498db; /* Board color matching theme */
+            border: none; /* Remove default border */
+            border-radius: 10px;
+            padding: 10px;
+            display: flex; /* Arrange columns horizontally */
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1); /* Inner shadow for depth */
+            margin: 0 auto 25px auto; /* Center board and add bottom margin */
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column-reverse; /* Pieces stack from bottom */
+            margin: 0 4px; /* Slightly reduced margin */
+        }
+
+        .cell {
+            width: 55px; /* Slightly smaller cells */
+            height: 55px;
+            background-color: #ecf0f1; /* Light grey for empty cells */
+            border: none; /* Remove cell borders */
+            border-radius: 50%;
+            margin: 4px 0;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+            box-shadow: inset 0 3px 5px rgba(0,0,0,0.1); /* Inner shadow for hole effect */
+            display: flex; /* Needed for potential future content alignment */
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Hover effect on columns */
+         .column:hover .cell:not(.player1):not(.player2) {
+            /* Optional: subtle hover effect on empty cells in the hovered column */
+             /* background-color: #dfe6e9; */
+         }
+
+        .column:hover {
+            transform: translateY(-2px); /* Slight lift on column hover */
+             transition: transform 0.15s ease-out;
+        }
+
+
+        /* Player Piece Styling */
+        .cell.player1 {
+            background-color: #e74c3c; /* Red */
+            box-shadow: inset 0 3px 5px rgba(0,0,0,0.3), 0 2px 3px rgba(0,0,0,0.2); /* Add slight outer shadow too */
+        }
+
+        .cell.player2 {
+            background-color: #f1c40f; /* Yellow */
+            box-shadow: inset 0 3px 5px rgba(0,0,0,0.3), 0 2px 3px rgba(0,0,0,0.2);
+        }
+
+        /* Winning Piece Highlight */
+        .cell.winner {
+            /* Keep a distinct highlight */
+            box-shadow: 0 0 15px 5px #2ecc71; /* Bright green glow */
+            border: 3px solid #ffffff; /* White border to make it pop */
+        }
+
+        /* Button Container */
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px; /* Space between buttons */
+            margin-top: 10px; /* Adjust spacing */
+        }
+
+        /* Button Styling */
+        button {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        button:active {
+             transform: translateY(0px);
+             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+
+        #restart-button {
+            background-color: #3498db; /* Blue */
+            color: white;
+        }
+        #restart-button:hover {
+             background-color: #2980b9;
+        }
+
+        #reset-scores-button {
+            background-color: #bdc3c7; /* Grey */
+            color: #555;
+        }
+         #reset-scores-button:hover {
+            background-color: #95a5a6;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 750px) {
+             #game-wrapper {
+                padding: 20px;
+            }
+             #board {
+                padding: 8px;
+            }
+            .cell {
+                width: 45px;
+                height: 45px;
+                 margin: 3px 0;
+            }
+             .column {
+                margin: 0 3px;
+            }
+             h1 { font-size: 1.8em; margin-bottom: 20px;}
+            #status { font-size: 1.1em; margin-bottom: 15px;}
+            button { font-size: 1em; padding: 10px 20px;}
+        }
+
+         @media (max-width: 550px) {
+            body { padding: 10px; } /* Reduce body padding */
+             #score-board {
+                position: static; /* Make scoreboard flow normally */
+                margin-bottom: 15px;
+                width: 80%;
+                max-width: 250px; /* Limit scoreboard width */
+                padding: 10px 15px;
+            }
+             #game-wrapper {
+                 padding: 15px;
+                 max-width: 100%; /* Allow card to use more width */
+             }
+             .cell {
+                width: 38px; /* Further reduce cell size */
+                height: 38px;
+                 margin: 2px 0;
+            }
+              .column {
+                margin: 0 2px;
+            }
+             h1 { font-size: 1.6em; margin-bottom: 15px;}
+             #status { font-size: 1em; }
+             .button-container { flex-direction: column; gap: 10px; } /* Stack buttons */
+             button { width: 100%; } /* Make buttons full width */
+         }
+          @media (max-width: 400px) {
+              .cell {
+                width: 32px;
+                height: 32px;
+            }
+          }
+
+    </style>
+</head>
+<body>
+
+    <!-- Score Board -->
+    <div id="score-board">
+        <h3>Score</h3>
+        <div id="score-values">
+            <span id="player1-score">Red: 0</span>
+            <span>|</span>
+            <span id="player2-score">Yellow: 0</span>
+        </div>
+    </div>
+
+    <!-- Main Game Card -->
+    <div id="game-wrapper">
+        <h1>Connect Four</h1>
+        <div id="status">Player 1's Turn (Red)</div>
+        <div id="board"></div>
+        <div class="button-container">
+            <button id="restart-button">Restart Game</button>
+            <button id="reset-scores-button">Reset Scores</button>
+        </div>
+    </div>
+
+    <script>
+        const boardElement = document.getElementById('board');
+        const statusElement = document.getElementById('status');
+        const restartButton = document.getElementById('restart-button');
+        const resetScoresButton = document.getElementById('reset-scores-button');
+        const player1ScoreElement = document.getElementById('player1-score');
+        const player2ScoreElement = document.getElementById('player2-score');
+
+        const ROWS = 6;
+        const COLS = 7;
+        let board = []; // 2D array (0: empty, 1: player1, 2: player2)
+        let currentPlayer = 1; // 1 for Red, 2 for Yellow
+        let gameOver = false;
+        let winnerCells = []; // To store winning cells for highlight
+
+        // Score tracking
+        let player1Score = 0;
+        let player2Score = 0;
+
+        // --- Game Initialization ---
+
+        function createBoard() {
+            boardElement.innerHTML = ''; // Clear previous board
+            board = []; // Reset logical board
+            winnerCells = [];
+
+            for (let c = 0; c < COLS; c++) {
+                board.push(Array(ROWS).fill(0)); // Initialize logical column
+
+                const columnElement = document.createElement('div');
+                columnElement.classList.add('column');
+                columnElement.dataset.col = c; // Store column index
+
+                for (let r = 0; r < ROWS; r++) {
+                    const cellElement = document.createElement('div');
+                    cellElement.classList.add('cell');
+                    cellElement.dataset.row = r;
+                    cellElement.dataset.col = c;
+                    columnElement.appendChild(cellElement);
+                }
+
+                columnElement.addEventListener('click', handleColumnClick);
+                boardElement.appendChild(columnElement);
+            }
+        }
+
+        function initializeGame() {
+            createBoard(); // Recreate the board visuals
+            currentPlayer = 1;
+            gameOver = false;
+            removeWinnerHighlight(); // Clear any previous highlights
+            updateStatus();
+            // Note: Scores are NOT reset here, only on Reset Scores button
+        }
+
+        function updateScoreboard() {
+            player1ScoreElement.textContent = `Red: ${player1Score}`;
+            player2ScoreElement.textContent = `Yellow: ${player2Score}`;
+        }
+
+        function resetScores() {
+            player1Score = 0;
+            player2Score = 0;
+            updateScoreboard();
+             // Optional: Also restart the current game when scores are reset
+             // initializeGame();
+        }
+
+        // --- Game Logic ---
+
+        function handleColumnClick(event) {
+            if (gameOver) return;
+
+            let columnElement = event.target.closest('.column'); // More robust way to get the column
+            if (!columnElement) return; // Click wasn't within a column structure
+
+            const col = parseInt(columnElement.dataset.col);
+            const row = findLowestEmptyRow(col);
+
+            if (row === -1) {
+                // Column is full - maybe add a visual indication?
+                return;
+            }
+
+            // Update logical board
+            board[col][row] = currentPlayer;
+
+            // Update visual board
+            const cellElement = getCellElement(row, col);
+            if (cellElement) {
+                 cellElement.classList.add(`player${currentPlayer}`);
+            }
+
+            // Check for win or draw
+            if (checkWin(row, col)) {
+                gameOver = true;
+                highlightWinnerCells();
+                if (currentPlayer === 1) {
+                    player1Score++;
+                } else {
+                    player2Score++;
+                }
+                updateScoreboard();
+                updateStatus(`Player ${currentPlayer} (${currentPlayer === 1 ? 'Red' : 'Yellow'}) Wins!`);
+            } else if (checkDraw()) {
+                gameOver = true;
+                updateStatus("It's a Draw!");
+            } else {
+                // Switch player
+                switchPlayer();
+                updateStatus();
+            }
+        }
+
+        function findLowestEmptyRow(col) {
+            for (let r = 0; r < ROWS; r++) {
+                if (board[col][r] === 0) {
+                    return r;
+                }
+            }
+            return -1; // Column full
+        }
+
+        function switchPlayer() {
+            currentPlayer = currentPlayer === 1 ? 2 : 1;
+        }
+
+        function updateStatus(message = null) {
+            if (message) {
+                statusElement.textContent = message;
+                // Keep color neutral/dark grey for win/draw messages
+                 statusElement.style.color = '#333';
+            } else if (!gameOver) {
+                const playerName = currentPlayer === 1 ? 'Red' : 'Yellow';
+                statusElement.textContent = `Player ${currentPlayer}'s Turn (${playerName})`;
+                 // Change status color based on current player
+                 statusElement.style.color = currentPlayer === 1 ? '#e74c3c' : '#f39c12'; // Use player colors or slightly darker variants
+            }
+        }
+
+        function getCellElement(row, col) {
+            return boardElement.querySelector(`.column[data-col='${col}'] .cell[data-row='${row}']`);
+        }
+
+        // --- Win/Draw Detection ---
+
+        function checkWin(lastRow, lastCol) {
+            const player = board[lastCol][lastRow];
+            winnerCells = []; // Reset before checking
+
+            function checkDirection(dr, dc) {
+                let count = 0;
+                let potentialWinSequence = [];
+
+                for (let i = -3; i <= 3; i++) {
+                    const r = lastRow + i * dr;
+                    const c = lastCol + i * dc;
+
+                    if (r >= 0 && r < ROWS && c >= 0 && c < COLS && board[c] && board[c][r] === player) {
+                        count++;
+                        potentialWinSequence.push({r, c});
+                        if (count >= 4) {
+                            // Extract the actual winning 4 cells from the sequence found
+                             winnerCells = potentialWinSequence.slice(potentialWinSequence.length - 4);
+                            return true; // Found a win
+                        }
+                    } else {
+                        count = 0; // Reset count if sequence breaks
+                        potentialWinSequence = []; // Reset potential sequence
+                    }
+                }
+                return false; // No win in this direction
+            }
+
+            return checkDirection(0, 1) || // Horizontal
+                   checkDirection(1, 0) || // Vertical
+                   checkDirection(1, 1) || // Diagonal Down-Right
+                   checkDirection(-1, 1);  // Diagonal Up-Right (Corrected check)
+        }
+
+        function highlightWinnerCells() {
+            winnerCells.forEach(cellCoords => {
+                const cellElement = getCellElement(cellCoords.r, cellCoords.c);
+                if (cellElement) {
+                    cellElement.classList.add('winner');
+                }
+            });
+        }
+
+         function removeWinnerHighlight() {
+             const winningCells = boardElement.querySelectorAll('.cell.winner');
+             winningCells.forEach(cell => cell.classList.remove('winner'));
+         }
+
+
+        function checkDraw() {
+            // Check if the top row (index ROWS-1) of every column is filled
+            for (let c = 0; c < COLS; c++) {
+                if (board[c] && board[c][ROWS - 1] === 0) {
+                    return false; // Found an empty cell in the top row
+                }
+            }
+            // If loop completes, all top cells are filled
+            return !gameOver; // Return true only if not already won (prevents draw message on win)
+        }
+
+        // --- Event Listeners ---
+        restartButton.addEventListener('click', initializeGame);
+        resetScoresButton.addEventListener('click', resetScores);
+
+        // --- Initial Game Setup ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeGame();
+            updateScoreboard(); // Initialize scoreboard display
+        });
+
+    </script>
+
+</body>
+</html>
