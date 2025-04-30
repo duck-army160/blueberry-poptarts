@@ -25,6 +25,21 @@
     "link": "storage/other/galtonboard/index.html"
   },
   {
+    "name": "Tic Tac Toe",
+    "img": "storage/images/Screenshot 2025-04-29 180332.png",
+    "link": "storage/other/tictactoe/index.html"
+  },
+  {
+    "name": "Physics Playground",
+    "img": "storage/images/PHYSICS.png",
+    "link": "storage/other/physicsplayground/index.html"
+  },
+  {
+    "name": "CPU Physics Test",
+    "img": "storage/images/cpuphysics.png",
+    "link": "storage/other/stresstest/index.html"
+  },
+  {
     "name": "Bad AI Coded Snake",
     "img": "storage/images/ai-snake.jpg",
     "link": "storage/other/ai-coded-snake🐍🐍🐍🐍🔥🔥🔥🔥🔥🔥💰💰💰💵💵/index.html"

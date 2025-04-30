@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe Enhanced</title>
+    <style>
+        /* Google Font */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+        :root {
+            --background-start: #48b1bf; /* Light Teal */
+            --background-end: #0671ac;   /* Medium Blue */
+            --card-background: #ffffff;
+            --text-color: #333;
+            --primary-button-bg: #007bff; /* Blue */
+            --primary-button-hover: #0056b3;
+            --secondary-button-bg: #6c757d; /* Gray */
+            --secondary-button-hover: #5a6268;
+            --cell-bg: #e9ecef;
+            --cell-hover-bg: #dee2e6;
+            --border-color: #ced4da;
+            --player-x-color: #dc3545; /* Red */
+            --player-o-color: #198754; /* Green */
+            --label-color: #6c757d; /* Gray for labels */
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, var(--background-start), var(--background-end));
+            color: var(--text-color);
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #game-container {
+            background-color: var(--card-background);
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            max-width: 420px;
+            width: 100%;
+            box-sizing: border-box;
+            position: relative; /* Needed if score island was positioned absolutely relative to this */
+            z-index: 1; /* Ensure it's below the fixed score island if overlapping occurs */
+        }
+
+        h1 {
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #2a2a2a;
+        }
+
+        #game-mode {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 20px; /* Increased margin */
+            display: inline-flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #game-mode legend {
+            font-weight: 600;
+            padding: 0 8px;
+            font-size: 0.9em;
+            color: var(--label-color);
+        }
+
+        #game-mode label {
+            cursor: pointer;
+            font-size: 0.95em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+         #game-mode input[type="radio"] {
+             cursor: pointer;
+             accent-color: var(--primary-button-bg);
+         }
+
+        /* --- Score Island --- */
+        #score-island {
+            position: fixed; /* Position relative to the viewport */
+            top: 30px;      /* Distance from top */
+            right: 30px;     /* Distance from right */
+            background-color: var(--card-background);
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            z-index: 10; /* Ensure it stays on top */
+            min-width: 180px; /* Give it some base width */
+        }
+
+        .score-title {
+            margin: 0 0 10px 0;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--label-color);
+            border-bottom: 1px solid var(--border-color); /* Add separator line */
+            padding-bottom: 8px; /* Space below title */
+        }
+
+        .score-values {
+            font-size: 1.05em;
+            font-weight: 600;
+            color: #444;
+            line-height: 1.4; /* Better spacing for score numbers */
+        }
+        .score-values span { /* The score numbers themselves */
+            display: inline-block;
+            min-width: 20px;
+            text-align: center;
+        }
+        #score-x { color: var(--player-x-color); }
+        #score-o { color: var(--player-o-color); }
+        /* --- End Score Island --- */
+
+
+        #status {
+            font-size: 1.1em;
+            min-height: 1.5em;
+            margin-bottom: 20px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        #board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 270px;
+            max-width: 100%;
+            height: 270px;
+            margin: 15px auto 15px auto;
+            box-sizing: border-box;
+        }
+
+        .cell {
+            background-color: var(--cell-bg);
+            border: none;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            color: var(--text-color);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            aspect-ratio: 1 / 1;
+            line-height: 1;
+        }
+
+        .cell:hover:not(.occupied):not(.game-over) {
+            background-color: var(--cell-hover-bg);
+        }
+        .cell.occupied, .cell.game-over {
+            cursor: not-allowed;
+        }
+        .cell.player-x { color: var(--player-x-color); }
+        .cell.player-o { color: var(--player-o-color); }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .game-button {
+            padding: 12px 25px;
+            font-size: 1em;
+            font-weight: 600;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0, 0.1);
+        }
+
+        #reset-button {
+            background-color: var(--primary-button-bg);
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+        }
+        #reset-button:hover {
+            background-color: var(--primary-button-hover);
+            transform: translateY(-2px);
+        }
+        #reset-button:active { transform: translateY(0); }
+
+        #reset-score-button {
+            background-color: var(--secondary-button-bg);
+            box-shadow: 0 4px 10px rgba(108, 117, 125, 0.3);
+        }
+        #reset-score-button:hover {
+            background-color: var(--secondary-button-hover);
+            transform: translateY(-2px);
+        }
+        #reset-score-button:active { transform: translateY(0); }
+
+        /* --- Responsive Adjustments --- */
+        @media (max-width: 768px) { /* Adjust breakpoint as needed */
+            #score-island {
+                position: static; /* Change from fixed to static */
+                margin: 0 auto 25px auto; /* Center it above main container */
+                top: auto; /* Remove fixed positioning */
+                right: auto;
+                order: -1; /* Place it before game-container in flex flow if body was flex column */
+                           /* Since body is centering flex row, margin auto handles it */
+                width: 90%; /* Make it wider on small screens */
+                max-width: 300px; /* But not too wide */
+            }
+
+            body {
+                /* Optional: stack elements vertically on small screens */
+                 /* flex-direction: column; */
+                 padding-top: 20px; /* Ensure space if stacking */
+            }
+
+             #game-container {
+                 /* Adjust padding/margins if needed when stacked */
+             }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Score Island - Placed outside main container for fixed positioning -->
+    <div id="score-island">
+        <div class="score-title">Score</div>
+        <div class="score-values">
+            Player X: <span id="score-x">0</span> | Player O: <span id="score-o">0</span>
+        </div>
+    </div>
+
+    <div id="game-container">
+        <h1>Tic-Tac-Toe</h1>
+
+        <fieldset id="game-mode">
+            <legend>Game Mode</legend>
+            <label><input type="radio" name="mode" value="bot" checked> Vs. Bot</label>
+            <label><input type="radio" name="mode" value="2p"> 2 Players</label>
+        </fieldset>
+
+        <!-- Score board div removed from here -->
+
+        <div id="status">Player X's Turn</div>
+
+        <div id="board">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
+        </div>
+
+        <div class="button-container">
+            <button id="reset-button" class="game-button">Restart Game</button>
+            <button id="reset-score-button" class="game-button">Reset Scores</button>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const board = document.getElementById('board');
+        const cells = document.querySelectorAll('.cell');
+        const statusDisplay = document.getElementById('status');
+        const resetButton = document.getElementById('reset-button');
+        const scoreXDisplay = document.getElementById('score-x'); // Still targets the correct span
+        const scoreODisplay = document.getElementById('score-o'); // Still targets the correct span
+        const modeRadios = document.querySelectorAll('input[name="mode"]');
+        const resetScoreButton = document.getElementById('reset-score-button');
+
+        // Game State
+        let boardState = Array(9).fill(null);
+        let currentPlayer = 'X';
+        let isGameOver = false;
+        let scoreX = 0;
+        let scoreO = 0;
+        let gameMode = 'bot'; // Default mode
+
+        const winningCombinations = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+            [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+            [0, 4, 8], [2, 4, 6]             // Diagonals
+        ];
+
+        // --- Game Logic Functions ---
+
+        function updateStatus() {
+            if (isGameOver) return;
+
+            let statusText = '';
+            if (currentPlayer === 'X') {
+                statusText = `Player X's Turn`;
+            } else {
+                statusText = (gameMode === 'bot') ? "Bot's Turn (O)" : "Player O's Turn";
+            }
+            statusDisplay.textContent = statusText;
+        }
+
+        function handleCellClick(event) {
+            const clickedCell = event.target;
+            if (!clickedCell.classList.contains('cell')) return;
+
+            const clickedCellIndex = parseInt(clickedCell.dataset.index);
+
+            if (boardState[clickedCellIndex] !== null || isGameOver || (gameMode === 'bot' && currentPlayer === 'O')) {
+                return;
+            }
+
+            makeMove(clickedCell, clickedCellIndex, currentPlayer);
+
+            if (!isGameOver) {
+                switchPlayer();
+            }
+        }
+
+        function switchPlayer() {
+            currentPlayer = (currentPlayer === 'X') ? 'O' : 'X';
+            updateStatus();
+
+            if (currentPlayer === 'O' && gameMode === 'bot' && !isGameOver) {
+                setTimeout(botMove, 600);
+            }
+        }
+
+        function makeMove(cellElement, index, player) {
+            if (boardState[index] !== null || isGameOver) return;
+
+            boardState[index] = player;
+            cellElement.textContent = player;
+            cellElement.classList.add('occupied', `player-${player.toLowerCase()}`);
+
+            if (checkWin(player)) {
+                endGame(false, player);
+            } else if (boardState.every(cell => cell !== null)) {
+                endGame(true);
+            }
+        }
+
+        function checkWin(player) {
+            return winningCombinations.some(combination => {
+                return combination.every(index => boardState[index] === player);
+            });
+        }
+
+        function botMove() {
+            if (isGameOver || currentPlayer !== 'O' || gameMode !== 'bot') return;
+
+            // --- Simple Bot AI (same as before) ---
+            let bestMove = -1;
+            // 1. Check win
+            for (let i = 0; i < boardState.length; i++) { if (boardState[i] === null) { boardState[i] = 'O'; if (checkWin('O')) { bestMove = i; } boardState[i] = null; if (bestMove !== -1) break; } }
+            // 2. Check block
+            if (bestMove === -1) { for (let i = 0; i < boardState.length; i++) { if (boardState[i] === null) { boardState[i] = 'X'; if (checkWin('X')) { bestMove = i; } boardState[i] = null; if (bestMove !== -1) break; } } }
+             // 3. Center > Corner > Side > Random
+             if (bestMove === -1) {
+                 const available = boardState.map((v, i) => v === null ? i : null).filter(v => v !== null);
+                 if (available.length > 0) {
+                     const center = 4; const corners = [0, 2, 6, 8]; const sides = [1, 3, 5, 7];
+                     if (available.includes(center)) bestMove = center;
+                     else {
+                         const availCorners = corners.filter(c => available.includes(c));
+                         if (availCorners.length > 0) bestMove = availCorners[Math.floor(Math.random() * availCorners.length)];
+                         else {
+                              const availSides = sides.filter(s => available.includes(s));
+                              if (availSides.length > 0) bestMove = availSides[Math.floor(Math.random() * availSides.length)];
+                              else bestMove = available[Math.floor(Math.random() * available.length)]; // Fallback
+                         }
+                     }
+                 }
+             }
+             // --- End Bot AI ---
+
+             if (bestMove !== -1 && boardState[bestMove] === null) {
+                 const cellElement = document.querySelector(`.cell[data-index='${bestMove}']`);
+                 makeMove(cellElement, bestMove, 'O');
+                 if (!isGameOver) {
+                     switchPlayer();
+                 }
+             } else if (!isGameOver) {
+                 console.warn("Bot couldn't determine a move.");
+             }
+         }
+
+        function endGame(draw, winner = null) {
+            isGameOver = true;
+            cells.forEach(cell => cell.classList.add('game-over'));
+
+             if (draw) {
+                statusDisplay.textContent = "It's a Draw!";
+            } else {
+                statusDisplay.textContent = `${winner === 'X' ? 'Player X' : (gameMode === 'bot' ? 'Bot' : 'Player O')} wins! (${winner})`;
+                // Update Score
+                if (winner === 'X') {
+                    scoreX++;
+                    scoreXDisplay.textContent = scoreX;
+                } else {
+                    scoreO++;
+                    scoreODisplay.textContent = scoreO;
+                }
+            }
+        }
+
+        function resetGame() {
+            boardState.fill(null);
+            isGameOver = false;
+            currentPlayer = 'X';
+            cells.forEach(cell => {
+                cell.textContent = '';
+                cell.classList.remove('occupied', 'player-x', 'player-o', 'game-over');
+                // cell.style.cursor = 'pointer'; // Not needed if game-over class handles it
+            });
+            updateStatus();
+        }
+
+        function resetScores() {
+            scoreX = 0;
+            scoreO = 0;
+            scoreXDisplay.textContent = scoreX;
+            scoreODisplay.textContent = scoreO;
+            // resetGame(); // Decide if resetting scores should also reset the current game
+        }
+
+        function handleModeChange(event) {
+            gameMode = event.target.value;
+            resetGame();
+        }
+
+        // --- Event Listeners ---
+        cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+        resetButton.addEventListener('click', resetGame);
+        resetScoreButton.addEventListener('click', resetScores);
+        modeRadios.forEach(radio => radio.addEventListener('change', handleModeChange));
+
+        // --- Initial Setup ---
+        scoreXDisplay.textContent = scoreX; // Initialize score display
+        scoreODisplay.textContent = scoreO;
+        updateStatus();
+
+    </script>
+
+</body>
+</html>

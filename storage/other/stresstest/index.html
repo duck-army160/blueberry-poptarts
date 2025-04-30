@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPU Physics Benchmark - Distinct Shadows</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <style>
+        /* Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+
+        :root {
+            /* NEW White Theme */
+            --bg-color: #ffffff;         /* White background */
+            --card-bg: #f8f9fa;        /* Light grey card for contrast */
+            --text-dark: #212529;
+            --text-secondary: #6c757d;
+            --accent-red: #cb3131;
+            --accent-red-hover: #a92929;
+            --accent-blue: #314bcb;
+            --accent-blue-hover: #283da6;
+            --border-color: #dee2e6;
+            --canvas-bg: #ffffff;        /* White canvas */
+            --display-bg: #e9ecef;        /* Light grey display */
+            --display-border: #ced4da;
+            --display-text-dark: var(--text-dark);
+            --slider-thumb-bg: var(--accent-blue);
+            --warning-orange: #fd7e14;
+            --error-red: #dc3545;
+            /* Ray/Sun colors */
+            --sun-color: #FFDA63;        /* Yellow Sun */
+            /* --- MODIFIED SHADOW COLOR --- */
+            --shadow-color: rgba(60, 60, 60, 0.35); /* Darker, more neutral grey shadow */
+            /* --- END MODIFICATION --- */
+            --toggle-ray-off-bg: #6c757d;
+            --toggle-ray-on-bg: #ffc107;
+            --toggle-ray-on-hover: #e0a800;
+            --object-blue: #314bcb;       /* The specific blue for objects */
+            --object-blue-stroke: #1e2a7a; /* Darker blue stroke */
+            --obstacle-fill: #ced4da;     /* Light grey obstacles */
+            --wall-fill: #e9ecef;         /* Very light grey walls */
+        }
+
+        body { font-family: 'Poppins', sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background-color: var(--bg-color); color: var(--text-dark); padding: 20px; box-sizing: border-box; }
+        h1 { color: var(--text-dark); margin-bottom: 30px; font-weight: 700; font-size: 2.2em; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; width: 100%; max-width: 800px; text-align: center; }
+        #tester-container { background-color: var(--card-bg); border: 1px solid var(--border-color); padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06); text-align: center; width: 100%; max-width: 900px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; }
+        #canvas-container { width: 100%; height: 60vh; max-height: 500px; min-height: 300px; margin-bottom: 25px; border: 1px solid var(--border-color); background-color: var(--canvas-bg); position: relative; cursor: default; border-radius: 6px; overflow: hidden; }
+        #physics-canvas { display: block; width: 100%; height: 100%; }
+        #info-controls { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; align-items: stretch; width: 100%; padding: 20px 0 10px 0; border-top: 1px solid var(--border-color); margin-top: 15px; }
+        .display-group { background-color: var(--display-bg); border: 1px solid var(--display-border); padding: 12px 20px; border-radius: 6px; min-width: 130px; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+        .display-label { font-size: 0.8em; color: var(--text-secondary); margin-bottom: 6px; display: block; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+        .display-value { font-family: 'Roboto Mono', monospace; font-size: 1.9em; font-weight: 700; color: var(--text-dark); min-width: 70px; display: inline-block; line-height: 1.1; }
+        #fps-value.low { color: var(--warning-orange); } #fps-value.very-low { color: var(--error-red); }
+        .controls-column { display: flex; flex-direction: column; gap: 15px; align-items: center; justify-content: center; }
+        .settings-group { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 10px 0;}
+        .settings-label { font-size: 0.85em; color: var(--text-secondary); font-weight: 600; margin-bottom: 5px; }
+        .slider-container { display: flex; align-items: center; gap: 8px; }
+        .slider { -webkit-appearance: none; appearance: none; width: 120px; height: 6px; background: #ced4da; outline: none; opacity: 0.9; transition: opacity .2s; border-radius: 3px; cursor: pointer; }
+        .slider:hover { opacity: 1; }
+        .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; background: var(--slider-thumb-bg); border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .slider::-moz-range-thumb { width: 16px; height: 16px; background: var(--slider-thumb-bg); border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .slider-value { font-family: 'Roboto Mono', monospace; font-size: 0.95em; min-width: 40px; text-align: right; color: var(--text-dark); font-weight: 700; }
+        .control-button { padding: 10px 25px; font-size: 0.95em; font-family: 'Poppins', sans-serif; font-weight: 600; color: white; border: none; border-radius: 6px; cursor: pointer; transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease; min-width: 120px; letter-spacing: 0.5px; box-shadow: 0 2px 5px rgba(0,0,0, 0.1); }
+        .control-button:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .control-button:active { transform: translateY(0); box-shadow: inset 0 1px 2px rgba(0,0,0,0.1); }
+        .control-button:disabled { background-color: #adb5bd !important; color: #f8f9fa; cursor: not-allowed; transform: none; box-shadow: none; }
+        #start-button { background-color: var(--accent-blue); } #start-button:hover { background-color: var(--accent-blue-hover); }
+        #reset-button { background-color: var(--accent-red); } #reset-button:hover { background-color: var(--accent-red-hover); }
+        #ray-toggle-button { background-color: var(--toggle-ray-off-bg); }
+        #ray-toggle-button.active { background-color: var(--toggle-ray-on-bg); color: #333;}
+        #ray-toggle-button.active:hover { background-color: var(--toggle-ray-on-hover); }
+
+    </style>
+</head>
+<body>
+
+    <h1>CPU Physics Benchmark</h1>
+
+    <div id="tester-container">
+        <div id="canvas-container">
+            <canvas id="physics-canvas"></canvas>
+        </div>
+
+        <div id="info-controls">
+            <div class="display-group"> <div class="display-label">FPS</div> <div id="fps-value" class="display-value">--</div> </div>
+            <div class="display-group"> <div class="display-label">Objects</div> <div id="object-count-value" class="display-value">0</div> </div>
+            <div class="controls-column">
+                 <div class="button-group"> <button id="start-button" class="control-button">Start Test</button> <button id="reset-button" class="control-button">Reset</button> </div>
+                 <div class="settings-group"> <button id="ray-toggle-button" class="control-button">Ray FX OFF</button> </div>
+            </div>
+            <div class="controls-column">
+                <div class="settings-group">
+                    <div class="settings-label">Spawn Rate (ms)</div>
+                    <div class="slider-container"> <input type="range" id="spawn-rate-slider" class="slider" min="10" max="500" step="10" value="50"> <span id="spawn-rate-value" class="slider-value">50</span> </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Ensure Matter.js is loaded
+        if (typeof Matter === 'undefined') { alert('Error: Matter.js library not loaded!'); }
+        else {
+            // Module aliases
+            const { Engine, Render, Bodies, Body, Composite, Composites, Events, Bounds, Mouse, MouseConstraint, Vector, Vertices } = Matter;
+
+            // Elements
+            const canvasContainer = document.getElementById('canvas-container'); const canvas = document.getElementById('physics-canvas');
+            const startButton = document.getElementById('start-button'); const resetButton = document.getElementById('reset-button');
+            const fpsDisplay = document.getElementById('fps-value'); const objectCountDisplay = document.getElementById('object-count-value');
+            const spawnRateSlider = document.getElementById('spawn-rate-slider'); const spawnRateValue = document.getElementById('spawn-rate-value');
+            const rayToggleButton = document.getElementById('ray-toggle-button');
+
+            // Engine & Renderer
+            const engine = Engine.create(); const world = engine.world; engine.world.gravity.y = 1.0;
+            const render = Render.create({ element: canvasContainer, canvas: canvas, engine: engine, options: { width: canvasContainer.clientWidth, height: canvasContainer.clientHeight, wireframes: false, background: '#ffffff', pixelRatio: window.devicePixelRatio || 1 } }); Render.run(render);
+
+            // Boundaries
+            const wallThickness = 1000; let ground, ceiling, leftWall, rightWall;
+            function updateWalls() { const width = render.options.width; const height = render.options.height; if (ground) Composite.remove(world, [ground, ceiling, leftWall, rightWall]); const wallOptions = { isStatic: true, render: { fillStyle: '#e9ecef' } }; ground = Bodies.rectangle(width / 2, height + wallThickness / 2, width + wallThickness*2 , wallThickness, wallOptions); ceiling = Bodies.rectangle(width / 2, -wallThickness / 2, width + wallThickness*2, wallThickness, { ...wallOptions, render: { visible: false } }); leftWall = Bodies.rectangle(-wallThickness / 2, height / 2, wallThickness, height + wallThickness*2, wallOptions); rightWall = Bodies.rectangle(width + wallThickness / 2, height / 2, wallThickness, height + wallThickness*2, wallOptions); Composite.add(world, [ground, ceiling, leftWall, rightWall]); } updateWalls();
+
+            // Obstacles
+            function addObstacles() { const width = render.options.width; const height = render.options.height; const obstacleOptions = { isStatic: true, render: { fillStyle: '#ced4da' } }; Composite.add(world, [ Bodies.rectangle(width * 0.5, height * 0.65, width * 0.3, 15, { ...obstacleOptions, angle: Math.PI * 0.04 }), Bodies.rectangle(width * 0.3, height * 0.45, 15, height * 0.25, { ...obstacleOptions, angle: -Math.PI * 0.08 }), Bodies.rectangle(width * 0.7, height * 0.45, 15, height * 0.25, { ...obstacleOptions, angle: Math.PI * 0.09 }), Bodies.polygon(width * 0.5, height * 0.2, 5, 35, obstacleOptions), ]); } addObstacles();
+
+            // Mouse Interaction
+            const mouse = Mouse.create(render.canvas); const mouseConstraint = MouseConstraint.create(engine, { mouse: mouse, constraint: { stiffness: 0.2, render: { visible: false } } }); Composite.add(world, mouseConstraint); render.mouse = mouse; mouseConstraint.collisionFilter.mask = 0x0001;
+
+            // State & Config
+            let spawnInterval = null; let currentSpawnIntervalMs = 50; const OBJECT_SIZE_MIN = 8; const OBJECT_SIZE_MAX = 12; let isTesting = false; let rafId = null; let isRayTracingOn = false; let sunPosition = { x: 100, y: 50 }; let isDraggingSun = false; let sunDragOffset = { x: 0, y: 0 }; const sunRadius = 15;
+
+            // FPS Calculation
+            let frameCount = 0; let lastFpsUpdate = performance.now(); let lastFrameTime = lastFpsUpdate;
+
+            // Default Object Options
+            const defaultOptions = () => ({ restitution: 0.6, friction: 0.1, frictionAir: 0.01, render: { fillStyle: '#314bcb', strokeStyle: '#1e2a7a', lineWidth: 1 } });
+
+            // Control Functions
+            function spawnObject() { if (!isTesting) return; const width = render.options.width; const x = width * 0.1 + Math.random() * width * 0.8; const size = OBJECT_SIZE_MIN + Math.random() * (OBJECT_SIZE_MAX - OBJECT_SIZE_MIN); let body; const options = defaultOptions(); if (Math.random() < 0.5) { body = Bodies.circle(x, -30, size / 2, options); } else { body = Bodies.rectangle(x, -30, size, size, options); } Composite.add(world, body); }
+            function updateSpawnInterval() { spawnRateValue.textContent = currentSpawnIntervalMs; if (isTesting) { clearInterval(spawnInterval); if (currentSpawnIntervalMs > 0) spawnInterval = setInterval(spawnObject, currentSpawnIntervalMs); } }
+            function startTest() { if (isTesting) return; isTesting = true; startButton.disabled = true; startButton.textContent = "Testing..."; clearInterval(spawnInterval); if (currentSpawnIntervalMs > 0) spawnInterval = setInterval(spawnObject, currentSpawnIntervalMs); }
+            function resetTest() { isTesting = false; startButton.disabled = false; startButton.textContent = "Start Test"; clearInterval(spawnInterval); spawnInterval = null; Composite.clear(world, true); addObstacles(); Composite.add(world, mouseConstraint); fpsDisplay.textContent = '--'; fpsDisplay.className = 'display-value'; objectCountDisplay.textContent = '0'; frameCount = 0; lastFpsUpdate = performance.now(); lastFrameTime = lastFpsUpdate; }
+            function toggleRayTracing() { isRayTracingOn = !isRayTracingOn; rayToggleButton.textContent = isRayTracingOn ? "Ray FX ON" : "Ray FX OFF"; rayToggleButton.classList.toggle('active', isRayTracingOn); mouseConstraint.collisionFilter.mask = isRayTracingOn ? 0 : 0x0001; console.log("Ray Tracing:", isRayTracingOn ? "ON" : "OFF"); }
+
+            // Ray Effect Drawing
+            function drawRayEffect(event) {
+                if (!isRayTracingOn) return;
+                const ctx = render.context; const bodies = Composite.allBodies(world);
+                const shadowColor = getComputedStyle(document.documentElement).getPropertyValue('--shadow-color').trim(); // Get from CSS
+                const sunColor = getComputedStyle(document.documentElement).getPropertyValue('--sun-color').trim(); // Get from CSS
+                const canvasWidth = render.options.width; const canvasHeight = render.options.height;
+                ctx.save();
+                ctx.fillStyle = sunColor; ctx.beginPath(); ctx.arc(sunPosition.x, sunPosition.y, sunRadius, 0, Math.PI * 2); ctx.fill(); // Draw Sun
+                ctx.fillStyle = shadowColor; // Set shadow fill
+                bodies.forEach(body => {
+                    if (body.isStatic || !body.vertices || body.vertices.length < 2) return;
+                    const vertices = body.vertices; let minAngle = Infinity, maxAngle = -Infinity; let minPoint = vertices[0], maxPoint = vertices[0];
+                    vertices.forEach(vertex => { const angle = Math.atan2(vertex.y - sunPosition.y, vertex.x - sunPosition.x); if (angle < minAngle) { minAngle = angle; minPoint = vertex; } if (angle > maxAngle) { maxAngle = angle; maxPoint = vertex; } });
+                    if (minPoint === maxPoint) { minPoint = vertices[0]; maxPoint = vertices[1] || vertices[0]; }
+                    const point1 = minPoint; const point2 = maxPoint; const rayLength = canvasWidth * 2 + canvasHeight * 2;
+                    const vector1 = Vector.normalise(Vector.sub(point1, sunPosition)); const vector2 = Vector.normalise(Vector.sub(point2, sunPosition));
+                    const proj1 = Vector.add(sunPosition, Vector.mult(vector1, rayLength)); const proj2 = Vector.add(sunPosition, Vector.mult(vector2, rayLength));
+                    ctx.beginPath(); ctx.moveTo(point1.x, point1.y); ctx.lineTo(proj1.x, proj1.y); ctx.lineTo(proj2.x, proj2.y); ctx.lineTo(point2.x, point2.y); ctx.closePath(); ctx.fill();
+                });
+                ctx.restore();
+            }
+            Events.on(render, 'afterRender', drawRayEffect);
+
+            // Resize Handler
+            function handleResize() { const newWidth = canvasContainer.clientWidth; const newHeight = canvasContainer.clientHeight; render.options.width = newWidth; render.options.height = newHeight; render.canvas.width = newWidth; render.canvas.height = newHeight; Bounds.update(render.bounds, [{x:0, y:0}, {x:newWidth, y:newHeight}], {x:0,y:0}); updateWalls(); Composite.remove(world, Composite.allBodies(world).filter(b => b.isStatic && b !== ground && b !== ceiling && b !== leftWall && b !== rightWall)); addObstacles(); console.log(`Resized canvas to ${newWidth}x${newHeight}`); }
+            window.addEventListener('resize', handleResize);
+
+            // Event Listeners
+            startButton.addEventListener('click', startTest); resetButton.addEventListener('click', resetTest); rayToggleButton.addEventListener('click', toggleRayTracing);
+            spawnRateSlider.addEventListener('input', (e) => { currentSpawnIntervalMs = parseInt(e.target.value, 10); updateSpawnInterval(); });
+            canvas.addEventListener('mousedown', (event) => { if (!isRayTracingOn) return; const mousePos = mouse.position; const distSq = Vector.magnitudeSquared(Vector.sub(mousePos, sunPosition)); if (distSq < sunRadius * sunRadius * 4) { /* Increased hit area */ isDraggingSun = true; sunDragOffset.x = sunPosition.x - mousePos.x; sunDragOffset.y = sunPosition.y - mousePos.y; mouseConstraint.constraint.stiffness = 0; mouseConstraint.collisionFilter.mask = 0; canvasContainer.style.cursor = 'grabbing'; } });
+            canvas.addEventListener('mousemove', (event) => { if (isDraggingSun) { const mousePos = mouse.position; sunPosition.x = mousePos.x + sunDragOffset.x; sunPosition.y = mousePos.y + sunDragOffset.y; sunPosition.x = Math.max(sunRadius, Math.min(render.options.width - sunRadius, sunPosition.x)); sunPosition.y = Math.max(sunRadius, Math.min(render.options.height - sunRadius, sunPosition.y)); } });
+            canvas.addEventListener('mouseup', (event) => { if (isDraggingSun) { isDraggingSun = false; if (!isRayTracingOn) { mouseConstraint.constraint.stiffness = 0.2; mouseConstraint.collisionFilter.mask = 0x0001; } canvasContainer.style.cursor = 'default'; } });
+            canvas.addEventListener('mouseleave', () => { if (isDraggingSun) { isDraggingSun = false; if (!isRayTracingOn) { mouseConstraint.constraint.stiffness = 0.2; mouseConstraint.collisionFilter.mask = 0x0001; } canvasContainer.style.cursor = 'default'; } });
+
+            // Custom Game Loop
+            let lastTime = performance.now();
+            function gameLoop(currentTime) { const deltaTime = currentTime - lastTime; lastTime = currentTime; const clampedDelta = Math.min(deltaTime, 50); Engine.update(engine, clampedDelta); frameCount++; const timeSinceLastUpdate = currentTime - lastFpsUpdate; if (timeSinceLastUpdate >= 1000) { const fps = Math.round((frameCount * 1000) / timeSinceLastUpdate); fpsDisplay.textContent = fps; if (fps < 30) fpsDisplay.className = 'display-value very-low'; else if (fps < 50) fpsDisplay.className = 'display-value low'; else fpsDisplay.className = 'display-value'; const dynamicBodies = Composite.allBodies(world).filter(body => !body.isStatic); objectCountDisplay.textContent = dynamicBodies.length; frameCount = 0; lastFpsUpdate = currentTime; } rafId = requestAnimationFrame(gameLoop); }
+
+            // Initial Setup
+            spawnRateValue.textContent = currentSpawnIntervalMs; resetTest(); rafId = requestAnimationFrame(gameLoop);
+        }
+    </script>
+
+</body>
+</html>
