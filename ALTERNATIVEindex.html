@@ -39,11 +39,75 @@
     </main>
     <script>
         fetch('./storage/splash.json')
-            .then((res) => res.json())
-            .then((data) => {
-                document.querySelector('#splash').innerHTML =
-                    data[Math.floor(Math.random() * data.length)]
+            .then((res) => {
+                // Basic check if response is ok, can be expanded
+                if (!res.ok) {
+                    console.error("Failed to fetch splash.json, status:", res.status);
+                    return null; // Or throw an error
+                }
+                return res.json();
             })
+            .then((data) => {
+                if (data && data.length > 0) { // Check if data is not null and has items
+                    document.querySelector('#splash').innerHTML =
+                        data[Math.floor(Math.random() * data.length)];
+                } else {
+                    // Fallback if data is null or empty
+                    document.querySelector('#splash').innerHTML = "Your daily dose of fun!";
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching or parsing splash.json:", error);
+                // Fallback on any error during fetch/parse
+                document.querySelector('#splash').innerHTML = "Have an awesome day!";
+            });
+
+        // --- FUNCTION TO LAUNCH CURRENT PAGE IN ABOUT:BLANK ---
+        function launchab() {
+            const currentUrl = window.location.href;
+            let newWindow = null;
+
+            try {
+                newWindow = window.open('about:blank', '_blank');
+            } catch (e) {
+                console.error("Error opening window (popup blocker might be involved):", e);
+                alert('Popup could not be opened. Please check your browser settings and allow popups for this site.');
+                return;
+            }
+
+            if (newWindow) {
+                if (newWindow.document) { // Check if the document object is accessible
+                    newWindow.document.write(`
+                        <!DOCTYPE html>
+                        <html>
+                            <head>
+                                <title>Astral Gxmes</title>
+                                <style>
+                                    body, html { margin: 0; padding: 0; overflow: hidden; height: 100%; }
+                                    iframe { border: none; width: 100%; height: 100%; }
+                                </style>
+                            </head>
+                            <body>
+                                <iframe src="${currentUrl}"></iframe>
+                            </body>
+                        </html>
+                    `);
+                    newWindow.document.close();
+                } else {
+                    // This fallback might be hit if the popup was blocked or newWindow is not fully initialized
+                    // We can give it a slight delay and re-check, or just alert.
+                    setTimeout(() => {
+                        if (!newWindow || newWindow.closed || !newWindow.document) {
+                             alert('Popup was blocked or could not be accessed! Please allow popups for this site to use this feature.');
+                        }
+                    }, 100); // 100ms delay
+                }
+            } else {
+                // This alert means window.open itself returned null (most common popup block scenario)
+                alert('Popup blocked! Please allow popups for this site to use this feature.');
+            }
+        }
+        // --- END OF LAUNCHAB FUNCTION ---
     </script>
 </body>
 </html>

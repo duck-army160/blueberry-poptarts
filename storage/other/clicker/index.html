@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colorful Clicker Fiesta!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient-start: #ff9a9e;
+            --bg-gradient-end: #fecfef;
+            --panel-bg: rgba(255, 255, 255, 0.8);
+            --panel-bg-hover: rgba(255, 255, 255, 0.95);
+            --text-color: #333;
+            --heading-color: #2c3e50;
+            --score-color: #e74c3c; /* Vibrant red for score */
+            --cps-color: #2980b9; /* Blue for secondary stats */
+            --click-power-color: #8e44ad; /* Purple for click power */
+            --button-gradient-start: #ff7e5f; /* Coral */
+            --button-gradient-end: #feb47b;   /* Light Orange */
+            --button-text-color: white;
+            --button-shadow: rgba(0, 0, 0, 0.15);
+            --clicker-border-start: #fd746c;
+            --clicker-border-end: #ff9068;
+            --floating-score-color: #e91e63; /* Hot pink */
+        }
+
+        body {
+            font-family: 'Poppins', 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-image: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            margin: 0;
+            padding: 25px;
+            color: var(--text-color);
+            user-select: none;
+            min-height: 100vh;
+            box-sizing: border-box;
+            overflow-x: hidden; /* Prevent horizontal scroll from animations */
+        }
+
+        h1 {
+            font-weight: 700;
+            font-size: 3em;
+            margin-bottom: 30px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        h2 {
+            font-weight: 600;
+            font-size: 1.6em;
+            margin-bottom: 20px;
+            color: var(--heading-color);
+            text-align: left;
+            padding-left: 5px;
+        }
+
+        #game-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 35px;
+            align-items: flex-start;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .panel { /* Common styling for clicker and upgrades area */
+            background-color: var(--panel-bg);
+            backdrop-filter: blur(8px);
+            padding: 25px 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .panel:hover {
+            /* box-shadow: 0 12px 35px rgba(0,0,0,0.15); */
+        }
+
+
+        #clicker-area {
+            flex: 1 1 380px;
+            min-width: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #score-display {
+            font-size: 3.5em;
+            margin-bottom: 5px;
+            color: var(--score-color);
+            font-weight: 700;
+            line-height: 1.1;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        #cps-display {
+            font-size: 1em; margin-bottom: 3px; color: var(--cps-color); font-weight: 500;
+        }
+        #click-power-display {
+            font-size: 1em; margin-bottom: 25px; color: var(--click-power-color); font-weight: 500;
+        }
+
+        @keyframes clickerPulse {
+            0% { box-shadow: 0 0 10px 0px var(--clicker-border-start), inset 0 0 8px rgba(0,0,0,0.2); }
+            50% { box-shadow: 0 0 20px 8px var(--clicker-border-end), inset 0 0 12px rgba(0,0,0,0.3); }
+            100% { box-shadow: 0 0 10px 0px var(--clicker-border-start), inset 0 0 8px rgba(0,0,0,0.2); }
+        }
+
+        #clicker-image-container {
+            width: 230px;
+            height: 230px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            margin-bottom: 30px;
+            background-color: rgba(255,255,255,0.5);
+            animation: clickerPulse 3s infinite ease-in-out;
+            transition: transform 0.2s ease;
+        }
+        #clicker-image-container:hover {
+            transform: scale(1.03);
+        }
+
+
+        #clicker-image {
+            max-width: 95%; /* Slightly smaller than container to let pulse be more visible */
+            max-height: 95%;
+            object-fit: contain;
+            cursor: pointer;
+            transition: transform 0.1s cubic-bezier(0.22, 1, 0.36, 1); /* Snappy bounce */
+            border-radius: 50%;
+        }
+        #clicker-image:active {
+            transform: scale(0.90);
+        }
+
+        #upgrades-area {
+            flex: 1.5 1 550px; /* Give upgrades a bit more potential space */
+        }
+
+        #upgrades-list {
+            max-height: 65vh;
+            overflow-y: auto;
+            padding-right: 15px;
+            margin-right: -15px; /* Counteract padding for scrollbar */
+        }
+        #upgrades-list::-webkit-scrollbar { width: 10px; }
+        #upgrades-list::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); border-radius: 5px; }
+        #upgrades-list::-webkit-scrollbar-thumb { background: linear-gradient(var(--button-gradient-start), var(--button-gradient-end)); border-radius: 5px; }
+        #upgrades-list::-webkit-scrollbar-thumb:hover { background: linear-gradient(var(--button-gradient-end), var(--button-gradient-start)); }
+
+
+        .upgrade-item {
+            border: none; /* Remove border, rely on shadow and bg */
+            padding: 18px 20px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            background-color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .upgrade-item:hover {
+            background-color: var(--panel-bg-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 7px 18px rgba(0,0,0,0.08);
+        }
+         .upgrade-item:last-child { margin-bottom: 5px; }
+
+
+        .upgrade-info { flex-grow: 1; margin-right: 15px; }
+        .upgrade-info h3 {
+            margin: 0 0 6px 0;
+            font-size: 1.15em;
+            color: var(--heading-color);
+            font-weight: 600;
+        }
+        .upgrade-info p { margin: 4px 0; font-size: 0.9em; color: var(--text-color); }
+        .upgrade-info p span { font-weight: 600; }
+        .upgrade-info p#cost-display { color: var(--score-color); } /* Specific color for cost */
+
+
+        .upgrade-item button {
+            padding: 12px 22px;
+            font-size: 0.95em;
+            background-image: linear-gradient(to right, var(--button-gradient-start) 0%, var(--button-gradient-end) 50%, var(--button-gradient-start) 100%);
+            background-size: 200% auto;
+            color: var(--button-text-color);
+            border: none;
+            border-radius: 25px; /* Pill shape */
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 12px var(--button-shadow);
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1); /* Smooth, bouncy transition */
+            outline: none;
+        }
+        .upgrade-item button:hover:not(:disabled) {
+            background-position: right center; /* Change gradient direction */
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 7px 18px rgba(0,0,0,0.2);
+        }
+        .upgrade-item button:active:not(:disabled) {
+            transform: translateY(1px) scale(0.97);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            filter: brightness(0.95);
+        }
+        .upgrade-item button:disabled {
+            background-image: none;
+            background-color: #bdc3c7; /* Muted gray */
+            color: #7f8c8d;
+            cursor: not-allowed;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transform: none;
+        }
+        .upgrade-item button.can-afford-pulse {
+             animation: canAffordPulse 1.5s infinite;
+        }
+
+        @keyframes canAffordPulse {
+            0% { box-shadow: 0 4px 12px var(--button-shadow), 0 0 0 0 rgba(255, 126, 95, 0.5); } /* Use button color for pulse */
+            70% { box-shadow: 0 7px 18px rgba(0,0,0,0.2), 0 0 0 10px rgba(255, 126, 95, 0); }
+            100% { box-shadow: 0 4px 12px var(--button-shadow), 0 0 0 0 rgba(255, 126, 95, 0); }
+        }
+
+
+        #floating-scores-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1000;
+        }
+
+        .floating-score {
+            position: absolute;
+            font-size: 2em; /* Larger */
+            color: var(--floating-score-color);
+            opacity: 1;
+            animation: floatUpAndAway 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            pointer-events: none;
+            font-weight: 700;
+            text-shadow: 0 0 5px white, 0 0 10px rgba(255,255,255,0.7); /* White glow */
+            padding: 3px 6px;
+        }
+
+        @keyframes floatUpAndAway {
+            0% { transform: translateY(0) translateX(0) scale(0.6) rotate(0deg); opacity: 1; }
+            20% { transform: translateY(-30px) translateX(10px) scale(1.1) rotate(-5deg); }
+            100% { transform: translateY(-100px) translateX(-20px) scale(0.4) rotate(15deg); opacity: 0; }
+        }
+
+        @media (max-width: 800px) {
+            h1 { font-size: 2.5em; margin-bottom: 20px;}
+            #game-container { flex-direction: column; align-items: center; gap: 25px; }
+            #clicker-area, #upgrades-area { flex-basis: auto; width: 95%; max-width: 550px; }
+            #upgrades-list { max-height: 45vh; }
+            #clicker-image-container { width: 180px; height: 180px; }
+            .upgrade-item button { padding: 10px 18px; font-size: 0.9em; }
+            .floating-score { font-size: 1.6em; }
+        }
+        @media (max-width: 480px) {
+            body { padding: 15px; }
+            h1 { font-size: 2em; }
+            #score-display { font-size: 2.8em; }
+            #clicker-image-container { width: 150px; height: 150px; }
+            .panel { padding: 20px; border-radius: 15px; }
+            .upgrade-item { padding: 15px; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Colorful Clicker Fiesta!</h1>
+
+    <div id="game-container">
+        <div id="clicker-area" class="panel">
+            <div id="score-display">0</div>
+            <div id="cps-display">Points per second: 0</div>
+            <div id="click-power-display">Points per click: 1</div>
+            <div id="clicker-image-container">
+                <img id="clicker-image" src="" alt="Click Me!">
+            </div>
+        </div>
+
+        <div id="upgrades-area" class="panel">
+            <h2>Upgrades</h2>
+            <div id="upgrades-list">
+                <!-- Upgrades will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+    <div id="floating-scores-container"></div>
+
+
+    <script>
+        // ---------------------------------------------------
+        // CONFIGURATION
+        // ---------------------------------------------------
+        const CLICKER_IMAGE_URL = "https://assets.stickpng.com/images/580b57fcd9996e24bc43c0fc.png"; // Example: A colorful cookie
+        //const CLICKER_IMAGE_URL = "https://cdn-icons-png.flaticon.com/512/2913/2913008.png"; // Example: A gem
+
+        const upgradesData = [
+            { id: 'auto_clicker_1', name: 'Sparkle Dust', baseCost: 15, production: 0.1, type: 'auto', costIncreaseFactor: 1.15 },
+            { id: 'auto_clicker_2', name: 'Rainbow Sprinkler', baseCost: 100, production: 1, type: 'auto', costIncreaseFactor: 1.18 },
+            { id: 'auto_clicker_3', name: 'Joy Factory', baseCost: 1200, production: 10, type: 'auto', costIncreaseFactor: 1.20 },
+            { id: 'auto_clicker_4', name: 'Fiesta Cannon', baseCost: 15000, production: 55, type: 'auto', costIncreaseFactor: 1.22 },
+            { id: 'click_power_1', name: 'Happy Taps', baseCost: 50, production: 1, type: 'click', costIncreaseFactor: 1.30 },
+            { id: 'click_power_2', name: 'Magic Wand', baseCost: 500, production: 5, type: 'click', costIncreaseFactor: 1.35 },
+            { id: 'click_power_3', name: 'Unicorn Power', baseCost: 7500, production: 30, type: 'click', costIncreaseFactor: 1.40 }
+        ];
+
+        // ---------------------------------------------------
+        // GAME STATE
+        // ---------------------------------------------------
+        let score = 0;
+        let pointsPerClick = 1;
+        let pointsPerSecond = 0;
+        const upgrades = upgradesData.map(u => ({ ...u, owned: 0, currentCost: u.baseCost, wasDisabled: true }));
+
+
+        // ---------------------------------------------------
+        // DOM ELEMENTS
+        // ---------------------------------------------------
+        const scoreDisplay = document.getElementById('score-display');
+        const cpsDisplay = document.getElementById('cps-display');
+        const clickPowerDisplay = document.getElementById('click-power-display');
+        const clickerImage = document.getElementById('clicker-image');
+        const upgradesListDiv = document.getElementById('upgrades-list');
+        const floatingScoresContainer = document.getElementById('floating-scores-container');
+        const clickerImageContainer = document.getElementById('clicker-image-container');
+
+
+        // ---------------------------------------------------
+        // GAME LOGIC
+        // ---------------------------------------------------
+        function formatNumber(num) {
+            if (Math.abs(num) < 1000) return parseFloat(num.toFixed(1)).toString(); // Show 1 decimal, remove trailing .0
+            const suffixes = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"];
+            const i = Math.floor(Math.log10(Math.abs(num)) / 3);
+            if (i >= suffixes.length) return num.toExponential(2);
+            const scaledNum = num / Math.pow(1000, i);
+            return parseFloat(scaledNum.toFixed(1)).toString() + suffixes[i];
+        }
+
+        function updateDisplay() {
+            scoreDisplay.textContent = formatNumber(score);
+            cpsDisplay.textContent = `Points per second: ${formatNumber(pointsPerSecond)}`;
+            clickPowerDisplay.textContent = `Points per click: ${formatNumber(pointsPerClick)}`;
+
+            upgrades.forEach(upgrade => {
+                const costEl = document.getElementById(`cost-${upgrade.id}`);
+                const ownedEl = document.getElementById(`owned-${upgrade.id}`);
+                const buyButton = document.getElementById(`buy-${upgrade.id}`);
+
+                if (costEl) costEl.textContent = formatNumber(upgrade.currentCost);
+                if (ownedEl) ownedEl.textContent = upgrade.owned;
+
+                if (buyButton) {
+                    const canAfford = score >= upgrade.currentCost;
+                    buyButton.disabled = !canAfford;
+
+                    if (canAfford && upgrade.wasDisabled) {
+                        buyButton.classList.add('can-afford-pulse');
+                    } else if (!canAfford && !upgrade.wasDisabled) {
+                        buyButton.classList.remove('can-afford-pulse');
+                    } else if (canAfford && !buyButton.classList.contains('can-afford-pulse')) {
+                        // If it became affordable and somehow lost the class (e.g. after purchase)
+                        // and is still affordable for next level, re-add.
+                        // This might be redundant if `buyUpgrade` handles it.
+                    }
+                    upgrade.wasDisabled = !canAfford;
+                }
+            });
+        }
+
+        function createFloatingScore(amount, event) {
+            const floatingScore = document.createElement('div');
+            floatingScore.textContent = `+${formatNumber(amount)}`;
+            floatingScore.classList.add('floating-score');
+            const x = event.clientX;
+            const y = event.clientY;
+            floatingScore.style.left = `${x - 15 + (Math.random() * 20 - 10)}px`; // Add some jitter
+            floatingScore.style.top = `${y - 30 + (Math.random() * 10 - 5)}px`;
+            floatingScoresContainer.appendChild(floatingScore);
+            setTimeout(() => {
+                if (floatingScore.parentElement) {
+                    floatingScore.parentElement.removeChild(floatingScore);
+                }
+            }, 1450); // Animation duration is 1.5s
+        }
+
+        function handleClick(event) {
+            score += pointsPerClick;
+            createFloatingScore(pointsPerClick, event);
+            updateDisplay();
+        }
+
+        function buyUpgrade(upgradeId) {
+            const upgrade = upgrades.find(u => u.id === upgradeId);
+            if (!upgrade || score < upgrade.currentCost) return;
+
+            score -= upgrade.currentCost;
+            upgrade.owned++;
+            upgrade.currentCost = Math.ceil(upgrade.baseCost * Math.pow(upgrade.costIncreaseFactor, upgrade.owned));
+
+            if (upgrade.type === 'auto') pointsPerSecond += upgrade.production;
+            else if (upgrade.type === 'click') pointsPerClick += upgrade.production;
+            
+            const buyButton = document.getElementById(`buy-${upgrade.id}`);
+            if (buyButton) { // Remove pulse immediately after buying
+                 buyButton.classList.remove('can-afford-pulse');
+            }
+
+            updateDisplay(); // This will re-evaluate `can-afford-pulse` for the new cost
+        }
+
+        function renderUpgrades() {
+            upgradesListDiv.innerHTML = '';
+            upgrades.forEach(upgrade => {
+                const itemDiv = document.createElement('div');
+                itemDiv.classList.add('upgrade-item');
+                itemDiv.id = `upgrade-item-${upgrade.id}`;
+                let productionText = upgrade.type === 'auto' ?
+                    `+${formatNumber(upgrade.production)} PPS` :
+                    `+${formatNumber(upgrade.production)} per click`;
+
+                itemDiv.innerHTML = `
+                    <div class="upgrade-info">
+                        <h3>${upgrade.name} (Owned: <span id="owned-${upgrade.id}">${upgrade.owned}</span>)</h3>
+                        <p>Effect: ${productionText}</p>
+                        <p>Cost: <span id="cost-${upgrade.id}" class="cost-display">${formatNumber(upgrade.currentCost)}</span></p>
+                    </div>
+                    <button id="buy-${upgrade.id}">Buy</button>
+                `;
+                upgradesListDiv.appendChild(itemDiv);
+                document.getElementById(`buy-${upgrade.id}`).addEventListener('click', () => buyUpgrade(upgrade.id));
+            });
+        }
+
+        function gameLoop() {
+            score += pointsPerSecond * 0.1; // Points per 100ms tick
+            updateDisplay();
+        }
+
+        function initializeGame() {
+            clickerImage.src = CLICKER_IMAGE_URL;
+            clickerImage.addEventListener('click', handleClick);
+            renderUpgrades();
+            updateDisplay();
+            setInterval(gameLoop, 100);
+        }
+        document.addEventListener('DOMContentLoaded', initializeGame);
+    </script>
+</body>
+</html>

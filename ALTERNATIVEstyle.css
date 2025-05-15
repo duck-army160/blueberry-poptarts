@@ -1,7 +1,65 @@
-/* --- Google Font Import --- */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto:wght@400;500&display=swap');
+/* testcss.css - Purple/Neon Theme with All Features & Astral Gxmes Section */
 
-/* --- Base Styles --- */
+/* --- Google Font Import --- */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Roboto:wght@400;500&display=swap');
+
+/* --- Color Palette (Purple/Neon Theme) --- */
+:root {
+    --bg-gradient-start: #e20dfe;   /* Vibrant Magenta/Pink */
+    --bg-gradient-end: #113af2;     /* Deep Vibrant Blue */
+
+    --panel-bg-for-content-sections: rgba(25, 15, 55, 0.75);  /* Dark Purple, semi-transparent for distinct content sections like game grid area */
+    --panel-bg-hover: rgba(45, 30, 80, 0.85);
+
+    --text-color-light: #f5f0ff;
+    --text-color-medium: #d0c8e8;
+
+    --heading-color: #d215ff;          /* Vibrant Magenta for H1 and section titles */
+    --accent-color-main: #d215ff;     /* Main accent (Magenta) */
+    --accent-color-secondary: #1b3df5; /* Secondary accent (Vibrant Blue) */
+    --accent-color-tertiary: #6526f5;  /* Medium Purple for other accents */
+
+    --game-title-color: var(--accent-color-main); /* Game titles magenta */
+
+    --nav-link-color: var(--text-color-light);
+    --nav-link-hover-text: #ffffff;
+    --nav-link-hover-underline: var(--accent-color-secondary); /* Blue underline for nav */
+
+    /* For the prominent Astral Gxmes search bar */
+    --astral-search-bg: rgba(15, 10, 40, 0.9); /* Darker, more opaque for the bar */
+    --astral-search-border-color: rgba(101, 38, 245, 0.4);
+    --astral-search-text-color: var(--text-color-light);
+    --astral-search-placeholder-color: var(--text-color-medium);
+    --astral-search-focus-border: var(--accent-color-secondary);
+    --astral-search-focus-glow: rgba(27, 61, 245, 0.3);
+
+    /* For the regular search input (e.g., within a game grid page) */
+    --regular-search-bg: rgba(15, 10, 40, 0.8);
+    --regular-search-border-color: rgba(101, 38, 245, 0.3);
+    --regular-search-text-color: var(--text-color-light);
+    --regular-search-placeholder-color: var(--text-color-medium);
+    --regular-search-focus-border: var(--accent-color-secondary);
+    --regular-search-focus-glow: rgba(27, 61, 245, 0.3);
+    --regular-search-icon-color: #a09cc2;
+    --regular-search-icon-focus-color: var(--accent-color-secondary);
+
+
+    --game-item-bg: rgba(35, 25, 70, 0.8);
+    --game-item-border: rgba(101, 38, 245, 0.3);
+    --game-item-border-hover: var(--accent-color-tertiary);
+    --game-name-hover-color: var(--accent-color-secondary);
+
+    --button-gradient-start: var(--accent-color-secondary); /* Blue */
+    --button-gradient-end: var(--accent-color-tertiary); /* Medium Purple */
+    --button-text-color: #ffffff;
+    --button-shadow-color: rgba(27, 61, 245, 0.3);
+
+    --card-hover-glow-color1-rgba: rgba(210, 21, 255, 0.6); /* magenta */
+    --card-hover-glow-color2-rgba: rgba(27, 61, 245, 0.6); /* blue */
+}
+
+
+/* --- Base & Reset Styles --- */
 *,
 *::before,
 *::after {
@@ -16,25 +74,32 @@ html {
 
 body {
     font-family: 'Roboto', Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    /* --- REVERTED to Dark Background --- */
-    background-color: #121212; /* Very dark grey, almost black */
-    text-align: center;
-    color: #e0e0e0; /* Light grey text for good contrast */
+    background-image: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+    background-attachment: fixed;
+    color: var(--text-color-light);
     min-height: 100vh;
+    line-height: 1.6;
     overflow-x: hidden;
+    text-align: center;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
 }
 
 /* --- Header & Navigation --- */
 header {
-    background-color: #1f1f1f; /* Slightly lighter dark grey */
+    background-color: var(--astral-search-bg); /* Use a dark panel consistent with the search bar for header */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     padding: 15px 0;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Stronger shadow */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     position: sticky;
     top: 0;
     z-index: 1000;
     width: 100%;
+    border-bottom: 1px solid rgba(101, 38, 245, 0.3); /* Subtle purple border */
 }
 
 .nav-list {
@@ -51,7 +116,7 @@ header {
 }
 
 .nav-list a {
-    color: #b0b0b0; /* Medium grey */
+    color: var(--nav-link-color);
     text-decoration: none;
     font-weight: 500;
     font-family: 'Montserrat', sans-serif;
@@ -70,14 +135,14 @@ header {
     transform: translateX(-50%);
     width: 0;
     height: 2px;
-    background-color: #00aeff; /* Keep accent blue */
+    background-color: var(--nav-link-hover-underline);
     transition: width 0.3s ease;
 }
 
 .nav-list a:hover,
 .nav-list a:focus {
-    color: #ffffff; /* White on hover/focus */
-    background-color: rgba(0, 174, 255, 0.1);
+    color: var(--nav-link-hover-text);
+    background-color: rgba(27, 61, 245, 0.15);
     outline: none;
 }
 
@@ -88,140 +153,229 @@ header {
 
 .nav-list a:active {
     transform: scale(0.95);
-    background-color: rgba(0, 174, 255, 0.2);
+    background-color: rgba(27, 61, 245, 0.25);
 }
 
-/* --- Main Content & Typography --- */
-main {
+/* --- Main Content Area --- */
+/* This 'main' style is for pages where content sits directly on the body gradient,
+   like the Astral Gxmes title/search page. */
+main.on-gradient-bg {
+    padding: 30px 20px 40px 20px; /* Adjusted padding */
+    max-width: 1400px;
+    margin: 0 auto; /* Centered, assumes header provides top offset if sticky */
+    text-align: center;
+    background-color: transparent; /* No panel background */
+    backdrop-filter: none;
+    box-shadow: none;
+}
+
+/* This 'main' style is for pages where content (like game grid) is in a panel */
+main.content-panel {
     padding: 30px 20px;
     max-width: 1400px;
-    margin: 0 auto;
+    margin: 30px auto;
+    text-align: center;
+    background-color: var(--panel-bg-for-content-sections);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.25);
 }
 
-h1, h2, h3 {
+
+/* --- Typography --- */
+h1, h2, h3, h4, h5, h6 {
     font-family: "Montserrat", sans-serif;
-    color: #ffffff; /* White headings */
-    margin-bottom: 0.5em;
+    color: var(--text-color-light);
+    margin-bottom: 0.6em;
+    line-height: 1.3;
 }
 
-h1 {
+h1 { /* General H1, can be overridden */
     font-size: clamp(2.5rem, 5vw, 3.5rem);
-    margin-top: 20px;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
     font-weight: 700;
-    text-shadow: 0 3px 6px rgba(0,0,0,0.4);
-    line-height: 1.2;
+    color: var(--heading-color);
+    text-shadow: 0 0 10px var(--heading-color), 0 0 15px var(--card-hover-glow-color1-rgba);
+}
+
+/* Title for "Astral Gxmes" */
+.page-main-title { /* Specific for the large Astral Gxmes title */
+    color: var(--text-color-light);
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(2.8rem, 7vw, 4.2rem);
+    font-weight: 700;
+    text-shadow: 0 3px 6px rgba(0,0,0,0.4), 0 0 15px var(--accent-color-main);
+    margin-top: 6vh;
+    margin-bottom: 35px;
+    text-align: center;
+    line-height: 1.15;
 }
 
 .h1-accent {
-    color: #00aeff; /* Accent blue */
+    color: var(--accent-color-secondary);
     display: inline-block;
     transition: transform 0.3s ease;
 }
-
 h1:hover .h1-accent {
     transform: scale(1.05) rotate(-2deg);
 }
 
-
 p {
     font-size: 1.1rem;
-    line-height: 1.6;
-    color: #b0b0b0; /* Medium grey */
+    line-height: 1.7;
+    color: var(--text-color-medium);
     max-width: 800px;
-    margin: 0 auto 20px auto;
+    margin: 0 auto 25px auto;
 }
 
-/* --- Improved Search Input --- */
-#searchInput {
-    display: block; /* Make it block for centering */
+/* --- Search Input Styles --- */
+
+/* Prominent Search Bar (Astral Gxmes page style) */
+#searchInput.prominent-search {
+    display: block;
     width: 100%;
-    max-width: 500px; /* Slightly wider */
-    margin: 0 auto 45px auto; /* Center and add bottom margin */
-    padding: 14px 25px 14px 50px; /* More padding, space for icon */
-    font-size: 1.05rem; /* Slightly larger font */
+    max-width: 700px;
+    margin: 0 auto 40px auto;
+    padding: 18px 30px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--astral-search-text-color);
+    background-color: var(--astral-search-bg);
+    border: 2px solid var(--astral-search-border-color);
+    border-radius: 30px;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    background-image: none; /* No icon for this prominent style */
+}
+#searchInput.prominent-search::placeholder {
+    color: var(--astral-search-placeholder-color);
+    font-weight: 500;
+    opacity: 0.8;
+}
+#searchInput.prominent-search:focus {
+    background-color: rgba(30, 20, 60, 0.95); /* Darker purple on focus */
+    border-color: var(--astral-search-focus-border);
+    box-shadow: 0 0 0 4px var(--astral-search-focus-glow), 0 5px 15px rgba(0,0,0,0.2);
+    background-image: none;
+}
+
+/* Regular Search Input (e.g., for filtering game grid) */
+#searchInput:not(.prominent-search) {
+    display: block;
+    width: 100%;
+    max-width: 550px;
+    margin: 0 auto 45px auto;
+    padding: 14px 25px 14px 50px;
+    font-size: 1.05rem;
     font-weight: 400;
-    color: #e0e0e0; /* Light text */
-    background-color: #2a2a2a; /* Dark grey background */
-    border: 2px solid #444; /* Subtle border */
-    border-radius: 50px; /* Pill shape */
+    color: var(--regular-search-text-color);
+    background-color: var(--regular-search-bg);
+    border: 2px solid var(--regular-search-border-color);
+    border-radius: 50px;
     outline: none;
     transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
     position: relative;
-    /* Search Icon SVG - Grey */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='%23888888' class='bi bi-search' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='%23a09cc2' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: 18px center; /* Position icon */
-    background-size: 18px 18px; /* Icon size */
+    background-position: 18px center;
+    background-size: 18px 18px;
 }
-
-#searchInput::placeholder {
-    color: #888888; /* Lighter grey placeholder */
+#searchInput:not(.prominent-search)::placeholder {
+    color: var(--regular-search-placeholder-color);
     font-weight: 400;
     opacity: 1;
 }
+#searchInput:not(.prominent-search):focus {
+    background-color: rgba(30, 20, 60, 0.9);
+    border-color: var(--regular-search-focus-border);
+    box-shadow: 0 0 0 4px var(--regular-search-focus-glow);
+    /* Update icon color - requires JS or separate SVGs for robust pure CSS solution */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='${encodeURIComponent(getComputedStyle(document.documentElement).getPropertyValue('--regular-search-icon-focus-color').trim())}' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
+}
 
-#searchInput:focus {
-    background-color: #333; /* Slightly lighter on focus */
-    border-color: #00aeff; /* Accent blue border */
-    box-shadow: 0 0 0 4px rgba(0, 174, 255, 0.2); /* Subtle blue glow */
-    /* Search Icon SVG - Accent Blue */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='%2300aeff' class='bi bi-search' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
+#searchInput:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: rgba(5,2,15,0.6);
 }
 
 
-/* --- Buttons (General / Secondary) --- */
-button, button.secondary {
-    color: #ffffff; /* White text */
-    background: linear-gradient(45deg, #00aeff, #007acc); /* Blue gradient */
-    padding: 10px 20px;
+/* --- Buttons --- */
+/* Container for the action buttons below Astral Gxmes prominent search */
+.action-buttons-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 8vh;
+    padding: 0 15px;
+}
+
+button, .button { /* .button class can be applied to <a> tags */
+    color: var(--button-text-color);
+    background: linear-gradient(45deg, var(--button-gradient-start), var(--button-gradient-end));
+    padding: 12px 25px; /* Adjusted padding for a good size */
     border: none;
     font-size: 1rem;
     font-weight: 700;
     font-family: 'Montserrat', sans-serif;
-    border-radius: 6px;
+    border-radius: 25px; /* Pill shape for these buttons */
     cursor: pointer;
     transition: transform 0.15s ease-out, box-shadow 0.2s ease-out, background 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0, 174, 255, 0.25); /* Blue shadow */
-    margin: 5px;
+    box-shadow: 0 4px 10px var(--button-shadow-color);
+    margin: 5px; /* Default margin, can be overridden by flex gap */
+    display: inline-block;
+    text-align: center;
     user-select: none;
     -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
 }
 
-button:hover, button.secondary:hover {
-    background: linear-gradient(45deg, #0099e0, #006ab3); /* Slightly darker gradient */
-    box-shadow: 0 6px 15px rgba(0, 174, 255, 0.35);
+button:hover, .button:hover {
+    background: linear-gradient(45deg, var(--accent-color-tertiary), var(--button-gradient-start));
+    box-shadow: 0 6px 15px rgba(101, 38, 245, 0.4);
     transform: translateY(-2px);
 }
 
-button:active, button.secondary:active {
+button:active, .button:active {
     transform: translateY(1px) scale(0.98);
-    box-shadow: 0 2px 5px rgba(0, 174, 255, 0.25);
+    box-shadow: 0 2px 5px var(--button-shadow-color);
     transition-duration: 0.08s;
 }
 
-/* Specific styles for input[type=text] if NOT search */
-input[type=text]:not(#searchInput), select {
-     background-color: #2a2a2a; /* Dark grey */
+/* --- Form Inputs (Non-Search) --- */
+input[type="text"]:not(#searchInput),
+input[type="url"]:not(#searchInput),
+input[type="email"]:not(#searchInput),
+input[type="password"]:not(#searchInput),
+textarea,
+select {
+     background-color: var(--regular-search-bg);
      transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
      border-radius: 6px;
-     border: 2px solid #444;
+     border: 2px solid var(--regular-search-border-color);
      font-size: 1rem;
-     color: #e0e0e0;
-     text-align: center;
+     color: var(--regular-search-text-color);
      padding: 10px 15px;
-     margin: 5px auto;
+     margin: 10px auto;
      display: block;
      width: 100%;
-     max-width: 300px;
+     max-width: 400px;
+     text-align: left;
 }
-input[type=text]:not(#searchInput):focus, select:focus {
+input[type="text"]:not(#searchInput):focus,
+input[type="url"]:not(#searchInput):focus,
+input[type="email"]:not(#searchInput):focus,
+input[type="password"]:not(#searchInput):focus,
+textarea:focus,
+select:focus {
     outline: none;
-    border-color: #00aeff;
-    background-color: #333;
-    box-shadow: 0 0 0 3px rgba(0, 174, 255, 0.2);
+    border-color: var(--regular-search-focus-border);
+    background-color: rgba(30,20,60,0.9);
+    box-shadow: 0 0 0 3px var(--regular-search-focus-glow);
 }
 
 /* --- Game Grid Layout --- */
@@ -231,8 +385,18 @@ input[type=text]:not(#searchInput):focus, select:focus {
     gap: 25px;
     padding: 20px 0;
     max-width: 1400px;
-    margin: 40px auto;
+    margin: 0 auto 40px auto; /* Removed top margin as main.content-panel or h1 will handle it */
 }
+
+/* Section title above game grid (if used) */
+.section-title {
+    color: var(--heading-color);
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    margin-bottom: 25px;
+    text-align: center; /* Explicitly center if not inherited */
+    text-shadow: 0 0 8px var(--heading-color);
+}
+
 
 /* --- Individual Game Item Styling --- */
 .game-item {
@@ -241,14 +405,14 @@ input[type=text]:not(#searchInput):focus, select:focus {
     flex-direction: column;
     justify-content: flex-end;
     aspect-ratio: 1 / 1;
-    background-color: #1f1f1f; /* Card background darker */
-    border: 1px solid #333; /* Subtle border */
-    border-radius: 8px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4); /* More pronounced shadow */
+    background-color: var(--game-item-bg);
+    border: 1px solid var(--game-item-border);
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
     overflow: hidden;
     cursor: pointer;
     opacity: 0;
-    animation: fadeInScaleUp 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    animation: fadeInScaleUp 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s forwards;
     text-decoration: none;
     transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
                 box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
@@ -258,7 +422,6 @@ input[type=text]:not(#searchInput):focus, select:focus {
     -webkit-user-select: none;
 }
 
-/* Game Item Image */
 .game-item img {
     position: absolute;
     top: 0;
@@ -266,136 +429,119 @@ input[type=text]:not(#searchInput):focus, select:focus {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 8px;
+    border-radius: 12px;
     transition: transform 0.4s ease, filter 0.4s ease;
     z-index: 1;
 }
 
-/* Game Name Overlay */
 .game-name {
     position: relative;
     width: 100%;
-    background: linear-gradient(180deg, rgba(31, 31, 31, 0) 0%, rgba(31, 31, 31, 0.9) 80%); /* Gradient using card bg color */
-    color: #ffffff; /* White text for name */
+    background: linear-gradient(180deg, rgba(35, 25, 70, 0) 0%, rgba(35, 25, 70, 0.95) 85%);
+    color: var(--text-color-light);
     padding: 25px 10px 10px 10px;
     font-size: 1rem;
     font-weight: 700;
     text-align: center;
     font-family: 'Montserrat', sans-serif;
-    opacity: 1;
-    transition: background 0.3s ease, color 0.3s ease;
+    transition: background 0.3s ease, color 0.3s ease, text-shadow 0.3s ease;
     z-index: 2;
     pointer-events: none;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.7); /* Stronger text shadow */
+    text-shadow: 0 1px 4px rgba(0,0,0,0.7);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
+.game-item .game-title, .game-item .game-name.game-title {
+    color: var(--game-title-color);
+    text-shadow: 0 0 5px var(--game-title-color);
+}
 
-/* Hover Effects for Game Item */
+
 .game-item:hover {
     transform: translateY(-8px) scale(1.03);
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.5);
-    border-color: #555; /* Slightly lighter border on hover */
+    box-shadow: 0 0 15px 2px var(--card-hover-glow-color1-rgba),
+                0 0 25px 5px var(--card-hover-glow-color2-rgba),
+                0 12px 25px rgba(0,0,0,0.45);
+    border-color: var(--game-item-border-hover);
 }
 
 .game-item:hover img {
     transform: scale(1.1);
-    filter: brightness(0.9); /* Less darkening */
+    filter: brightness(0.85);
 }
 
 .game-item:hover .game-name {
-    color: #00aeff; /* Highlight name color */
-    background: linear-gradient(180deg, rgba(31, 31, 31, 0) 0%, rgba(31, 31, 31, 0.95) 85%);
+    color: var(--game-name-hover-color);
+    text-shadow: 0 0 6px var(--game-name-hover-color);
+    background: linear-gradient(180deg, rgba(45, 30, 80, 0) 0%, rgba(45, 30, 80, 1) 90%);
+}
+.game-item:hover .game-name.game-title {
+    color: var(--game-title-color);
+    text-shadow: 0 0 8px var(--game-title-color);
 }
 
-/* Active (Click) State for Game Item */
+
 .game-item:active {
     transform: translateY(0px) scale(0.98);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     transition-duration: 0.1s;
 }
 
 .game-item:active img {
     transform: scale(1.05);
-    filter: brightness(0.8);
+    filter: brightness(0.75);
 }
 
-/* Fade-in Animation for Game Items */
 @keyframes fadeInScaleUp {
-    from {
-        opacity: 0;
-        transform: scale(0.9) translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
+    from { opacity: 0; transform: scale(0.9) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
 }
+
+/* --- Utility Classes --- */
+.center-container { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center; width: 90%; }
+.iframeWindow { position: absolute; width: 100vw; height: 100vh; /* Full viewport */ border: 0; padding: 0; margin: 0; left: 0; top: 0; /* Start from top */ background-color: #0a051a; z-index: 2000; /* High z-index */ }
+.frame, #frame { display: block; margin: auto; border: none; width:100%; height:100%; background-color: var(--text-color-light); /* Or any bg for iframe content */ }
+#splash { font-size: 1.5rem; color: var(--text-color-medium); }
+.pxyinput { width: 100%; max-width: 600px; margin: 20px auto; /* Inherits other input styles */ }
 
 /* --- Responsive Design --- */
-/* Medium Screens */
 @media (max-width: 992px) {
-    .game-grid {
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-        gap: 20px;
-    }
-     h1 { font-size: clamp(2.2rem, 4.5vw, 3rem); }
-     .nav-list { gap: 8px 20px; }
-     #searchInput { max-width: 450px; } /* Adjust max-width */
+    .game-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
+    h1, .page-main-title { font-size: clamp(2.2rem, 4.5vw, 3rem); }
+    .nav-list { gap: 8px 20px; }
+    #searchInput:not(.prominent-search), #searchInput.prominent-search { max-width: 450px; }
 }
 
-/* Small Screens */
 @media (max-width: 768px) {
-    .game-grid {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-        gap: 15px;
-    }
+    .game-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
     header { padding: 12px 0; }
     .nav-list { gap: 6px 15px; }
     .nav-list a { padding: 6px 12px; font-size: 0.9rem; }
-    h1 { font-size: clamp(2rem, 6vw, 2.8rem); }
+    h1, .page-main-title { font-size: clamp(2rem, 6vw, 2.8rem); }
+    .page-main-title { margin-top: 4vh; margin-bottom: 30px; }
     p { font-size: 1rem; }
-    #searchInput {
-         max-width: 90%;
-         padding: 12px 20px 12px 45px; /* Adjust padding */
-         font-size: 1rem;
-         background-position: 15px center; /* Adjust icon pos */
-         margin-bottom: 35px;
-     }
-     .game-name { font-size: 0.9rem; padding: 20px 8px 8px 8px; }
-     button, button.secondary, input[type=text]:not(#searchInput), select {
-         font-size: 0.95rem;
-         padding: 8px 16px;
-     }
+    #searchInput:not(.prominent-search), #searchInput.prominent-search { max-width: 90%; padding: 12px 20px 12px 45px; font-size: 1rem; margin-bottom: 35px; }
+    #searchInput.prominent-search { padding: 16px 25px; background-image: none; } /* Re-adjust for prominent */
+    #searchInput:not(.prominent-search) { background-position: 15px center; }
+    .action-buttons-container { gap: 15px; margin-bottom: 6vh; }
+    .game-name { font-size: 0.9rem; padding: 20px 8px 8px 8px; }
+    button, .button, input[type="text"]:not(#searchInput), select { font-size: 0.95rem; padding: 8px 16px; }
+    .frame, #frame { height: calc(100vh - 70px); } /* If header is present with iframe */
 }
 
-/* Extra Small Screens */
 @media (max-width: 480px) {
-     .game-grid {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        gap: 12px;
-    }
-     h1 { font-size: clamp(1.8rem, 7vw, 2.4rem); }
-     .nav-list { gap: 5px 10px; }
-     .nav-list a { padding: 5px 10px; font-size: 0.85rem; }
-      #searchInput {
-         max-width: 95%;
-         padding: 11px 18px 11px 40px; /* Adjust padding */
-         background-position: 12px center; /* Adjust icon pos */
-         background-size: 16px 16px; /* Adjust icon size */
-         font-size: 0.9rem;
-     }
-      .game-name { font-size: 0.8rem; padding: 15px 5px 5px 5px; }
-     button, button.secondary, input[type=text]:not(#searchInput), select {
-         font-size: 0.9rem;
-         padding: 7px 14px;
-     }
+    .game-grid { grid-template-columns: repeat(auto-fill, minmax(calc(50% - 10px), 1fr)); gap: 12px; }
+    h1, .page-main-title { font-size: clamp(1.8rem, 7vw, 2.4rem); }
+    .page-main-title { margin-top: 3vh; margin-bottom: 25px; }
+    .nav-list { gap: 5px 10px; }
+    .nav-list a { padding: 5px 10px; font-size: 0.85rem; }
+    #searchInput:not(.prominent-search), #searchInput.prominent-search { max-width: 95%; padding: 11px 18px 11px 40px; font-size: 0.9rem; margin-bottom: 30px; }
+    #searchInput.prominent-search { padding: 14px 20px; background-image: none; } /* Re-adjust for prominent */
+    #searchInput:not(.prominent-search) { background-position: 12px center; background-size: 16px 16px; }
+    .action-buttons-container { gap: 10px; margin-bottom: 5vh; }
+    .button { padding: 10px 20px; font-size: 0.9rem; }
+    .game-name { font-size: 0.8rem; padding: 15px 5px 5px 5px; }
+    button, .button, input[type="text"]:not(#searchInput), select { font-size: 0.9rem; padding: 7px 14px; }
+    .frame, #frame { height: 100vh; width: 100vw; max-width: 100%; border-radius: 0; } /* Full screen iframe */
 }
-
-/* --- Utility classes (Unchanged) --- */
-.center-container { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center; }
-.iframeWindow { position: absolute; width: 100vw; height: 90vh; border: 0; padding: 0; margin: 0; left: 0; bottom: 0; background-color: #141414; }
-.frame, #frame { border-radius: 8px; background-color: white; display: block; margin: auto; border: none; height: calc(100vh - 80px); width: calc(100vw - 30px); max-width: 95%; }
-#splash { font-size: 1.5rem; color: #b0b0b0; }
-.pxyinput { width: 100%; max-width: 600px; margin: 20px auto; }
