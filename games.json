@@ -783,5 +783,10 @@
     "name": "Super Mario Bros 3",
     "img": "storage/images/supermariobros3.png",
     "link": "storage/gxmes/supermariobros3/index.html"
+  },
+  {
+    "name": "Bad Piggies",
+    "img": "storage/images/badpiggies.png",
+    "link": "storage/gxmes/badpiggies/index.html"
   }
 ]
